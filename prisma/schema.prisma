@@ -62,6 +62,8 @@ model User {
     sessions      Session[]
 }
 
+//a table holding liked shoes
+
 model VerificationToken {
     identifier String
     token      String   @unique
