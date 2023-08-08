@@ -1,9 +1,11 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
-import Link from "next/link";
+import Image from "next/image";
+// import Link from "next/link";
 
 import { api } from "~/utils/api";
 import SwipeableComponent from "./components/SwipeableComponent";
+
 
 export default function Home() {
   
@@ -23,7 +25,7 @@ export default function Home() {
           
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8"></div>
           <div className="flex flex-col items-center gap-2">
-            <img src="00.png" width="250px"></img>
+            <Image width={250} src={`00.png`} alt="stitchedIT" />
             <AuthShowcase />
             <SwipeableComponent />
           </div>
