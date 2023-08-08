@@ -1,13 +1,12 @@
-'use client';
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
-import TinderCard from "react-tinder-card"; 
+
 import { api } from "~/utils/api";
 import SwipeableComponent from "./components/SwipeableComponent";
 
 export default function Home() {
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
+  
   
   return (
     <>

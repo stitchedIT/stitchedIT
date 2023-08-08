@@ -41,7 +41,7 @@ const ImageStack = ({ imageIndex }: ImageStackProps) => {
         width={275}
         height={275}
         draggable={false}
-        src={`https://raw.githubusercontent.com/ThyDrSlen/orwell-scraper/main/shoes/${imageNames[imageIndex]?.split(".")[0] ?? ""}`}
+        src={`https://raw.githubusercontent.com/ThyDrSlen/orwell-scraper/main/shoes/${imageNames[imageIndex]}`}
         alt="stacked image"
       />
     </div>

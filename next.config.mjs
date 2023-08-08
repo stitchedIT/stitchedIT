@@ -7,7 +7,10 @@ await import("./src/env.mjs");
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: false,
-
+  images: {
+    domains: ['raw.githubusercontent.com'],
+  },
+  
   /**
    * If you have `experimental: { appDir: true }` set, then you must comment the below `i18n` config
    * out.
@@ -21,3 +24,4 @@ const config = {
 };
 
 export default config;
+
