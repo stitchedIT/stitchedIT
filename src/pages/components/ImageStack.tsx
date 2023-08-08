@@ -1,4 +1,9 @@
 import { useState, useEffect } from "react";
+import Image from "next/image";
+
+interface ImageData {
+  name: string;
+}
 
 interface ImageStackProps {
   imageIndex: number;
@@ -10,15 +15,19 @@ const ImageStack = ({ imageIndex }: ImageStackProps) => {
 
   useEffect(() => {
     const fetchImages = async () => {
-      const response = await fetch(
-        "https://api.github.com/repos/ThyDrSlen/orwell-scraper/contents/shoes"
-      );
-      const data = await response.json();
-      const imageNames = data.map((item: any) => item.name);
-      setImageNames(imageNames);
-      setIsLoading(false);
+      try {
+        const response = await fetch(
+          "https://api.github.com/repos/ThyDrSlen/orwell-scraper/contents/shoes"
+        );
+        const data: ImageData[] = (await response.json()) as ImageData[];
+        const imageNames = data.map((item) => item.name);
+        setImageNames(imageNames);
+        setIsLoading(false);
+      } catch (error) {
+        console.error(error);
+      }
     };
-    fetchImages();
+    fetchImages().catch((error) => console.log(error));
   }, []);
 
   if (isLoading) {
@@ -28,9 +37,11 @@ const ImageStack = ({ imageIndex }: ImageStackProps) => {
   return (
     <div>
       <p>{imageNames[imageIndex]?.split(".")[0]}</p>
-      <img width="275px"
-        draggable="false"
-        src={`https://raw.githubusercontent.com/ThyDrSlen/orwell-scraper/main/shoes/${imageNames[imageIndex]}`}
+      <Image
+        width={275}
+        height={275}
+        draggable={false}
+        src={`https://raw.githubusercontent.com/ThyDrSlen/orwell-scraper/main/shoes/${imageNames[imageIndex]?.split(".")[0] ?? ""}`}
         alt="stacked image"
       />
     </div>
