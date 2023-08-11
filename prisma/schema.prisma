@@ -99,7 +99,7 @@ model ClothingItem {
   color           String?
   description     String?
   imageUrl        String
-  linkUrl            String?
+  linkUrl         String?
   recommendations Recommendation[]
   wishedBy        User[]           @relation("UserWishlist")
   createdAt       DateTime         @default(now())
