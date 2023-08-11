@@ -52,18 +52,19 @@ model Session {
 }
 
 model User {
-  id              String           @id @default(cuid())
-  name            String?
-  email           String?          @unique
-  emailVerified   DateTime?
-  image           String?
-  accounts        Account[]
-  recommendations Recommendation[]
+  id            String           @id @default(cuid())
+  name          String?
+  email         String?
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  posts         Post[]
+  comments      Comment[]
   sessions        Session[]
-  posts           Post[]
-  savedPosts      Post[]           @relation("BookmarkedPosts")
-  comments        Comment[] // Two-way relation established here
-  wishlist        ClothingItem[]   @relation("UserWishlist")
+  recommendations Recommendation[]
+  bookmarkedPosts Post[] @relation("BookmarkedPosts")
+  wishlist      ClothingItem[] @relation("UserWishlist")
+  likes         Likes[]
 }
 
 model Post {
@@ -73,9 +74,10 @@ model Post {
   description  String?
   brandTags    String[]
   imageUrl     String
-  likes        Int       @default(0)
+  likesCount   Int
   comments     Comment[]
   bookmarkedBy User[]    @relation("BookmarkedPosts")
+  likedBy      Likes[]
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 }
@@ -84,7 +86,7 @@ model Comment {
   id        Int      @id @default(autoincrement())
   content   String
   userId    String
-  user      User     @relation(fields: [userId], references: [id]) // Two-way relation established here
+  user      User     @relation(fields: [userId], references: [id])
   postId    Int
   post      Post     @relation(fields: [postId], references: [id])
   createdAt DateTime @default(now())
@@ -93,9 +95,11 @@ model Comment {
 model ClothingItem {
   id              Int              @id @default(autoincrement())
   brand           String
+  type            String
+  color           String?
   description     String?
   imageUrl        String
-  price           Decimal
+  linkUrl            String?
   recommendations Recommendation[]
   wishedBy        User[]           @relation("UserWishlist")
   createdAt       DateTime         @default(now())
@@ -107,11 +111,18 @@ model Recommendation {
   user           User         @relation(fields: [userId], references: [id])
   clothingItemId Int
   clothingItem   ClothingItem @relation(fields: [clothingItemId], references: [id])
-  feedback       String? // e.g. "Liked", "Disliked", "Neutral"
+  feedback       String
   createdAt      DateTime     @default(now())
 }
 
-//a table holding liked shoes
+model Likes {
+  id     Int    @id @default(autoincrement())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  postId Int
+  post   Post   @relation(fields: [postId], references: [id])
+}
+
 
 model VerificationToken {
   identifier String
