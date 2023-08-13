@@ -11,7 +11,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <SessionProvider session={session}>
-      <Navbar />
       <Component {...pageProps} />
     </SessionProvider>
   );
