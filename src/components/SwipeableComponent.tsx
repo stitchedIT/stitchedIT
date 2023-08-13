@@ -1,6 +1,7 @@
 import { useState, useEffect,useRef } from "react";
 import dynamic from "next/dynamic";
 import ImageStack from "./ImageStack";
+import React from "react";
 
 const TinderCard = dynamic(() => import("react-tinder-card"), { ssr: false });
 

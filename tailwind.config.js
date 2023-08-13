@@ -17,6 +17,12 @@ module.exports = {
     },
     extend: {
       colors: {
+        stitched: {
+          black: '#000000',
+          pink: '#F70085',
+          lightPink: '#F4B9C2',
+          darkGray: '#333333',
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

@@ -1,22 +1,24 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
+import Navbar from "../components/NavBar";
+import { NextPage } from "next";
 // import Link from "next/link";
-
 import { api } from "~/utils/api";
-import SwipeableComponent from "./components/SwipeableComponent";
+import SwipeableComponent from "../components/SwipeableComponent";
 
 
-export default function Home() {
+const HomePage:NextPage = () => {
   
   
   return (
     <>
       <Head>
-        <title>stitchedIT</title>
+        <title>Landing Page</title>
         <meta name="description" content="An app to explore new clothes." />
         <link rel="icon" href="/00.png" />
       </Head>
+      <Navbar />
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
           <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
@@ -27,7 +29,7 @@ export default function Home() {
           <div className="flex flex-col items-center gap-2">
             <Image width={250} height={250} src={`/00.png`} alt="stitchedIT" />
             <AuthShowcase />
-            <SwipeableComponent />
+            {/* <SwipeableComponent /> */}
           </div>
         </div>
       </main>
@@ -59,3 +61,5 @@ function AuthShowcase() {
     </div>
   );
 }
+
+export default HomePage;
