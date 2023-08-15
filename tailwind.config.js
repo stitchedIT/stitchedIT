@@ -22,6 +22,7 @@ module.exports = {
           pink: '#F70085',
           lightPink: '#F4B9C2',
           darkGray: '#333333',
+          sand: '#AEA990'
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
