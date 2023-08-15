@@ -1,98 +1,112 @@
 import Head from "next/head";
 import { NextPage } from "next";
+import { useRouter } from "next/router";
 import Navbar from "~/components/NavBar";
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { signIn, useSession } from 'next-auth/react';
 import React from "react";
+import { useForm } from 'react-hook-form';
 
 const Signup: NextPage = () => {
-    return (
-        <>
-            <Head>
-                <title>Signup Page</title>
-                <meta name="description" content="An app to explore new clothes." />
-                <link rel="icon" href="/00.png" />
-            </Head>
-            <main className="min-h-screen justify-center bg-black">
-                <Navbar />
-                <section className='container'>
-                    <div className='flex flex-col justify-center text-center p-5'>
-                        <h1 className='text-stitched-pink text-5xl'>Create an Account</h1>
-                        <div className='pt-5' />
-                        <p className='text-stitched-sand text-xl'>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Accusamus, dolores odio natus sequi mollitia neque modi dolore quis dolorum reprehenderit incidunt quo dignissimos nostrum sapiente possimus laborum quasi. Labore, enim.</p>
-                    </div>
+  const { data: session } = useSession();
+  const router = useRouter();
+  const { register, handleSubmit, watch, formState: { errors } } = useForm();
 
-                    <div className='pt-10' />
+  if (session) {
+    router.push('/'); // Redirect to home if the user is already authenticated
+  }
 
-                    <Card className='container border-none'>
-                        <CardHeader className="space-y-1">
-                            <CardTitle className="text-3xl text-slate-50">Signup</CardTitle>
-                            <CardDescription className='text-md'>
-                            Enter your email below to create your account
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="grid gap-4 text-slate-50">
-                            <div className="grid grid-cols-2 gap-6">
-                                <Button variant="outline">
-                                    {/* <Icons.gitHub className="mr-2 h-4 w-4" /> */}
-                                    Discord
-                                </Button>
-                                <Button variant="outline">
-                                    {/* <Icons.google className="mr-2 h-4 w-4" /> */}
-                                    Google
-                                </Button>
-                            </div>
+  const handleFormSubmit = async (formData: any): Promise<void> => {
+    if (formData.password !== formData.retypePassword) {
+      alert('Passwords do not match');
+      return;
+    }
 
-                            <div className="relative">
-                                <div className="absolute inset-0 flex items-center">
-                                    <span className="w-full border-t" />
-                                </div>
-                                <div className="relative flex justify-center text-xs uppercase">
-                                    <span className="bg-black text-slate-50 px-2 text-muted-foreground">
-                                    Or continue with
-                                    </span>
-                                </div>
-                            </div>
+    console.log('User information:', formData);
 
-        
-                            <div className="grid gap-2">
-                                <Label htmlFor="email" className='text-stitched-pink'>Email</Label>
-                                <Input className='p-2 roun' id="email" type="email" placeholder="jasonp@gmail.com" />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="fullName" className='text-stitched-pink'>Full Name</Label>
-                                <Input className='p-2 roun' id="fullName" type="text" placeholder="Jason Paulino" />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="username" className='text-stitched-pink'>Full Name</Label>
-                                <Input className='p-2 roun' id="username" type="text" placeholder="jasonpaulino" />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="password" className='text-stitched-pink'>Password</Label>
-                                <Input className='p-2 roun' id="password" type="password" placeholder="Stitched123!"/>
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="password" className='text-stitched-pink'>Re-type Passoword</Label>
-                                <Input className='p-2 roun' id="password" type="password" placeholder="Stitched123!"/>
-                            </div>
-                        </CardContent>
-                        <CardFooter>
-                            <Button className="w-full">Create account</Button>
-                        </CardFooter>
-                    </Card>
-                </section>
-            </main>
-        </>
-    )
-}
+    // ontinue with the API call here if needed
+  };
+
+  return (
+    <>
+      <Head>
+        <title>Signup Page</title>
+        <meta name="description" content="An app to explore new clothes." />
+        <link rel="icon" href="/00.png" />
+      </Head>
+      <main className="min-h-screen flex flex-col justify-center bg-black">
+        <Navbar />
+        <section className='container mx-auto p-4'>
+          <div className='flex flex-col justify-center text-center p-5'>
+            <h1 className='text-stitched-pink text-5xl'>Create an Account</h1>
+            <div className='pt-5' />
+            <p className='text-stitched-sand text-xl'>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Accusamus, dolores odio natus sequi mollitia neque modi dolore quis dolorum reprehenderit incidunt quo dignissimos nostrum sapiente possimus laborum quasi. Labore, enim.</p>
+          </div>
+
+          <div className='pt-10' />
+
+          <Card className='mx-auto border-none'>
+            <CardContent className="grid gap-4 text-slate-50">
+              <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Button variant="outline" onClick={() => signIn('discord')} className="md:col-span-1">
+                    Discord
+                  </Button>
+                  <Button variant="outline" onClick={() => signIn('google')} className="md:col-span-1">
+                    Google
+                  </Button>
+                </div>
+
+                <div className="relative my-4">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-black text-slate-50 px-2 text-muted-foreground">
+                      Or continue with
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="email" className='text-stitched-pink'>Email</Label>
+                    <Input {...register('email')} className='p-2 roun' id="email" type="email" placeholder="jasonp@gmail.com" />
+                  </div>
+                  <div>
+                    <Label htmlFor="fullName" className='text-stitched-pink'>Full Name</Label>
+                    <Input {...register('fullName')} className='p-2 roun' id="fullName" type="text" placeholder="Jason Paulino" />
+                  </div>
+                  <div>
+                    <Label htmlFor="username" className='text-stitched-pink'>Username</Label>
+                    <Input {...register('username')} className='p-2 roun' id="username" type="text" placeholder="jasonpaulino" />
+                  </div>
+                  <div>
+                    <Label htmlFor="password" className='text-stitched-pink'>Password</Label>
+                    <Input {...register('password')} className='p-2 roun' id="password" type="password" placeholder="Stitched123!"/>
+                  </div>
+                  <div className="md:col-span-2">
+                    <Label htmlFor="retype-password" className='text-stitched-pink'>Re-type Password</Label>
+                    <Input {...register('retypePassword')} className='p-2 roun' id="retype-password" type="password" placeholder="Stitched123!"/>
+                  </div>
+                </div>
+                <CardFooter>
+                  <Button type="submit" className="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-[#2e026d] hover:bg-white">Create account</Button>
+                </CardFooter>
+              </form>
+            </CardContent>
+          </Card>
+        </section>
+      </main>
+    </>
+  );
+};
 
 export default Signup;
