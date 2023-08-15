@@ -32,10 +32,10 @@ export const postRouter = createTRPCRouter({
   }),
 
   // Get a specific post
-  getPostById: publicProcedure
-    .input(z.object({ postId: z.string() }))
-    .query(({ input, ctx }) => {
-      return ctx.prisma.post.findUnique({ where: { id: input.postId } });
-    }),
+  // getPostById: publicProcedure
+  //   .input(z.object({ postId: z.string() }))
+  //   .query(({ input, ctx }) => {
+  //     return ctx.prisma.post.findUnique({ where: { id: input.postId } });
+  //   }),
 });
 
