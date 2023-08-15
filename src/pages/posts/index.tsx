@@ -20,23 +20,7 @@ function CreatePostComponent() {
   const [tag, setTag] = useState('');
 
 const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    try {
-      const result = await api.post.addPost.useMutation(formData);
-        // Post creation was successful
-        console.log(result);
-        // Maybe reset the form or navigate away, etc.
-        setFormData({
-            userId: '', 
-            description: '', 
-            brandTags: [], 
-            imageUrl: ''
-        });
-    } catch (error) {
-        // Handle the error
-        console.error(error);
-    }
+  
 };
 
   const handleAddTag = () => {
