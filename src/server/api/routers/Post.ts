@@ -15,9 +15,9 @@ export const postRouter = createTRPCRouter({
       imageUrl: z.string(),
     }))
     .mutation(async ({ input, ctx }) => {
-      return ctx.prisma.post.create({
+      return await ctx.prisma.post.create({
         data: {
-          userId: input.userId,
+          userId:input.userId,
           description: input.description,
           brandTags: input.brandTags,
           imageUrl: input.imageUrl,
