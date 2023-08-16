@@ -1,5 +1,6 @@
 import Head from "next/head";
 import { NextPage } from "next";
+import { api } from "~/utils/api"; 
 import { useRouter } from "next/router";
 import Navbar from "~/components/NavBar";
 import { Button } from "@/components/ui/button";
@@ -11,13 +12,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn, useSession } from 'next-auth/react';
-import React from "react";
 import { useForm } from 'react-hook-form';
 
 const Signup: NextPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
+
+  const createUser = api.user.addUser.useMutation();
 
   if (session) {
     router.push('/'); // Redirect to home if the user is already authenticated
@@ -31,7 +33,8 @@ const Signup: NextPage = () => {
 
     console.log('User information:', formData);
 
-    // ontinue with the API call here if needed
+    // continue with the API call here if needed
+    createUser.mutate(formData);
   };
 
   return (
@@ -85,8 +88,8 @@ const Signup: NextPage = () => {
                     <Input {...register('fullName')} className='p-2 roun' id="fullName" type="text" placeholder="Jason Paulino" />
                   </div>
                   <div>
-                    <Label htmlFor="username" className='text-stitched-pink'>Username</Label>
-                    <Input {...register('username')} className='p-2 roun' id="username" type="text" placeholder="jasonpaulino" />
+                    <Label htmlFor="userName" className='text-stitched-pink'>Username</Label>
+                    <Input {...register('userName')} className='p-2 roun' id="userName" type="text" placeholder="jasonpaulino" />
                   </div>
                   <div>
                     <Label htmlFor="password" className='text-stitched-pink'>Password</Label>
