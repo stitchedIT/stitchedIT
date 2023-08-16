@@ -10,6 +10,7 @@ import { postRouter } from "~/server/api/routers/Post";
 export const appRouter = createTRPCRouter({
   example: exampleRouter,
   post: postRouter,
+  
 });
 
 // export type definition of API

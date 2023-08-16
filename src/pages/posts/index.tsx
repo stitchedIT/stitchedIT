@@ -2,13 +2,17 @@ import React, { useState } from 'react';
 import { api } from "~/utils/api"; 
 import { useSession } from 'next-auth/react';
 function CreatePostComponent() {
-    
+  
+  const { data: sessionData } = useSession();
+
+
   type FormData = {
     userId: string;
     description?: string;
     brandTags: string[];
     imageUrl: string;
   };
+
   
   const [formData, setFormData] = useState<FormData>({
     userId: '',
@@ -19,8 +23,14 @@ function CreatePostComponent() {
   
   const [tag, setTag] = useState('');
 
+const createPost = api.post.addPost.useMutation();
+
 const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-  
+  event.preventDefault();
+  console.log("session", sessionData?.user?.id)
+  formData.userId = sessionData?.user?.id || '';
+  createPost.mutate(formData);
+  // console.log(formData);
 };
 
   const handleAddTag = () => {
@@ -32,11 +42,6 @@ const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <input 
-        value={formData.userId}
-        onChange={e => setFormData(prev => ({ ...prev, userId: e.target.value }))}
-        placeholder="User ID"
-      />
       
       <textarea 
         value={formData.description}
@@ -61,7 +66,7 @@ const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         onChange={e => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
         placeholder="Image URL"
       />
-
+  
       <button type="submit">Create Post</button>
     </form>
   )
