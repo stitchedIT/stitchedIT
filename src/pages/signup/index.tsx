@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signIn, useSession } from 'next-auth/react';
-import { useForm } from 'react-hook-form';
+import { signIn, signOut, useSession } from 'next-auth/react';
+import { useForm } from 'react-hook-form' ;
 
 const Signup: NextPage = () => {
   const { data: session } = useSession();
@@ -62,6 +62,8 @@ const Signup: NextPage = () => {
                   <Button variant="outline" onClick={() => signIn('discord')} className="md:col-span-1">
                     Discord
                   </Button>
+                  
+
                   <Button variant="outline" onClick={() => signIn('google')} className="md:col-span-1">
                     Google
                   </Button>
