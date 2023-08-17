@@ -8,16 +8,18 @@ import {
 export const postRouter = createTRPCRouter({
   // Add a post
   addPost: protectedProcedure
-    .input(z.object({
-      userId: z.string(),
-      description: z.string().optional(),
-      brandTags: z.array(z.string()),
-      imageUrl: z.string(),
-    }))
+    .input(
+      z.object({
+        userId: z.string(),
+        description: z.string().optional(),
+        brandTags: z.array(z.string()),
+        imageUrl: z.string(),
+      })
+    )
     .mutation(async ({ input, ctx }) => {
       return await ctx.prisma.post.create({
         data: {
-          userId:input.userId,
+          userId: input.userId,
           description: input.description,
           brandTags: input.brandTags,
           imageUrl: input.imageUrl,
@@ -25,26 +27,29 @@ export const postRouter = createTRPCRouter({
         },
       });
     }),
-    
-    deletePost: protectedProcedure
-    .input(z.object({
-      postId: z.number(),
-    }))
+
+  deletePost: protectedProcedure
+    .input(
+      z.object({
+        postId: z.number(),
+      })
+    )
     .mutation(async ({ input, ctx }) => {
       return await ctx.prisma.post.delete({
         where: {
           id: input.postId,
         },
       });
-      
     }),
-    
-    updatePost: protectedProcedure
-    .input(z.object({
-      postId: z.number(),
-      description: z.string().optional(),
-      brandTags: z.array(z.string()), 
-    }))
+
+  updatePost: protectedProcedure
+    .input(
+      z.object({
+        postId: z.number(),
+        description: z.string().optional(),
+        brandTags: z.array(z.string()),
+      })
+    )
     .mutation(async ({ input, ctx }) => {
       return await ctx.prisma.post.update({
         where: {
@@ -54,16 +59,24 @@ export const postRouter = createTRPCRouter({
           description: input.description,
           brandTags: input.brandTags,
         },
-      })
+      });
     }),
+
+
+
+
+
+
+
+
+
+
+
 
   // Get all posts
-  getAllPosts: protectedProcedure
-    .query(({ ctx }) => {
-      return ctx.prisma.post.findMany();
-    }),
-
-
+  getAllPosts: protectedProcedure.query(({ ctx }) => {
+    return ctx.prisma.post.findMany();
+  }),
 
   getAllPostsByUser: publicProcedure
     .input(z.object({ userId: z.string() }))
@@ -75,9 +88,9 @@ export const postRouter = createTRPCRouter({
       });
     }),
 
-    // Create a toggleLike procedure that is going to take in the userId and postId. If there is no existing like, we want to create that like and add to the post tables likecount, otherwise, we want to delete that like and decrease likecount in the post table.
+  // Create a toggleLike procedure that is going to take in the userId and postId. If there is no existing like, we want to create that like and add to the post tables likecount, otherwise, we want to delete that like and decrease likecount in the post table.
 
-    toggleLike: protectedProcedure
+  toggleLike: protectedProcedure
     .input(
       z.object({
         userId: z.string(),
@@ -136,6 +149,4 @@ export const postRouter = createTRPCRouter({
 
       return true;
     }),
-
 });
-
