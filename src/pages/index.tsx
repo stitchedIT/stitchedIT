@@ -2,7 +2,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
 import Navbar from "../components/NavBar";
-import { NextPage } from "next";
+import { type NextPage } from "next";
 import { api } from "~/utils/api";
 import SwipeableComponent from "../components/SwipeableComponent";
 

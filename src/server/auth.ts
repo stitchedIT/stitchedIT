@@ -1,5 +1,5 @@
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import {
   getServerSession,
   type NextAuthOptions,
@@ -9,43 +9,39 @@ import DiscordProvider from "next-auth/providers/discord";
 import GoogleProvider from "next-auth/providers/google";
 import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 
-/**
- * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
- * object and keep type safety.
- *
- * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
- */
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      // ...other properties
-      // role: UserRole;
     } & DefaultSession["user"];
   }
-
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
 }
 
-/**
- * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
- *
- * @see https://next-auth.js.org/configuration/options
- */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
-    
+    session: async ({ session, user }) => {
+      console.log("Session callback initiated. Session:", session);
+      console.log("User:", user);
+
+      if (!user?.id) {
+        console.error("User ID not present in session callback");
+        throw new Error("User ID is required in session.");
+      }
+
+      const updatedSession = {
+        ...session,
+        user: {
+          ...session.user,
+          id: user.id.toString(),
+        },
+      };
+
+      console.log("Updated Session:", updatedSession);
+      return updatedSession;
+    },
   },
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -54,37 +50,65 @@ export const authOptions: NextAuthOptions = {
       clientSecret: env.DISCORD_CLIENT_SECRET,
     }),
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      clientId: env.GOOGLE_CLIENT_ID || "",
+      clientSecret: env.GOOGLE_CLIENT_SECRET || "",
       authorization: {
         params: {
           prompt: "consent",
           access_type: "offline",
-          response_type: "code"
-        }
+          response_type: "code",
+        },
       },
-      
     }),
-    /**
-     * ...add more providers here.
-     *
-     * Most other providers require a bit more work than the Discord provider. For example, the
-     * GitHub provider requires you to add the `refresh_token_expires_in` field to the Account
-     * model. Refer to the NextAuth.js docs for the provider you want to use. Example:
-     *
-     * @see https://next-auth.js.org/providers/github
-     */
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        username: {
+          label: "Username:",
+          type: "text",
+          placeholder: "your-cool-username",
+        },
+        password: {
+          label: "Password",
+          type: "password",
+          placeholder: "your-awesome-password",
+        },
+      },
+      async authorize(credentials) {
+        if (!credentials) {
+          console.error("Credentials not provided");
+          throw new Error("Credentials not provided");
+        }
+
+        const inputUsername = credentials.username.trim();
+        console.log(`Attempting authorization for user: ${inputUsername}`);
+
+        const user = await prisma.user.findUnique({
+          where: { userName: inputUsername },
+        });
+
+        if (!user) {
+          console.error("No user found with this username:", inputUsername);
+          throw new Error("No user found with this username.");
+        }
+
+        const isValidPassword = await bcrypt.compare(
+          credentials.password,
+          user.password
+        );
+
+        if (!isValidPassword) {
+          console.error("Invalid password for user:", inputUsername);
+          throw new Error("Invalid password.");
+        }
+
+        console.log("Authorization successful for user:", inputUsername);
+        return user;
+      },
+    }),
   ],
 };
 
-/**
- * Wrapper for `getServerSession` so that you don't need to import the `authOptions` in every file.
- *
- * @see https://next-auth.js.org/configuration/nextjs
- */
-export const getServerAuthSession = (ctx: {
-  req: GetServerSidePropsContext["req"];
-  res: GetServerSidePropsContext["res"];
-}) => {
+export const getServerAuthSession = (ctx: GetServerSidePropsContext) => {
   return getServerSession(ctx.req, ctx.res, authOptions);
 };

@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { NextPage } from "next";
+import { type NextPage } from "next";
 
 const Login: NextPage = () => {
     return (
