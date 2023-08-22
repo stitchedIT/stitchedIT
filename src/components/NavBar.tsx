@@ -1,10 +1,11 @@
 import {
   SignInButton,
-  SignOutButton,
   SignUpButton,
+  UserButton,
   useUser,
 } from "@clerk/nextjs";
 import { buttonVariants } from "@/components/ui/button";
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 function Navbar() {
@@ -13,7 +14,7 @@ function Navbar() {
   const user = useUser();
 
   return (
-    <nav className="sticky top-0 flex items-center justify-between bg-transparent p-6">
+    <nav className="sticky top-0 flex items-center justify-between p-6 bg-stitched-black">
       <div className="flex items-center">
         <Avatar className="mr-6 flex items-center text-white">
           <AvatarImage
@@ -29,14 +30,25 @@ function Navbar() {
       </div>
       <div className="flex gap-4">
         {user.isSignedIn ? (
-          <SignOutButton>
-            <span
+          <>
+            <Link
+              href="/home"
               className={`${staticStyles} ${buttonVariants({
                 variant: "outline",
-              })}`}>
-              Logout
-            </span>
-          </SignOutButton>
+              })}`}
+            >
+              Home
+            </Link>
+            <Link
+              href="/feed"
+              className={`${staticStyles} ${buttonVariants({
+                variant: "outline",
+              })}`}
+            >
+              Feed
+            </Link>
+          <UserButton />
+          </>
         ) : (
           <>
             <SignInButton>
