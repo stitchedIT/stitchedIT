@@ -9,11 +9,10 @@
 
 import { initTRPC, TRPCError } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
-import { type Session } from "next-auth";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
+import { getAuth, SignedInAuthObject, SignedOutAuthObject } from '@clerk/nextjs/server'; // Added import for Clerk
 
 /**
  * 1. CONTEXT
@@ -24,7 +23,7 @@ import { prisma } from "~/server/db";
  */
 
 type CreateContextOptions = {
-  session: Session | null;
+  auth: SignedInAuthObject | SignedOutAuthObject; // Updated to use Clerk auth
 };
 
 /**
@@ -39,7 +38,7 @@ type CreateContextOptions = {
  */
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
-    session: opts.session,
+    auth: opts.auth, // Updated to use Clerk auth
     prisma,
   };
 };
@@ -51,14 +50,9 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
  * @see https://trpc.io/docs/context
  */
 export const createTRPCContext = async (opts: CreateNextContextOptions) => {
-  const { req, res } = opts;
-
-  // Get the session from the server using the getServerSession wrapper function
-  const session = await getServerAuthSession({ req, res });
-
-  return createInnerTRPCContext({
-    session,
-  });
+  const { req } = opts;
+  const auth = getAuth(req); // Updated to use Clerk auth
+  return createInnerTRPCContext({ auth });
 };
 
 /**
@@ -108,13 +102,12 @@ export const publicProcedure = t.procedure;
 
 /** Reusable middleware that enforces users are logged in before running the procedure. */
 const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
+  if (!ctx.auth.userId) { // Updated to use Clerk auth
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({
     ctx: {
-      // infers the `session` as non-nullable
-      session: { ...ctx.session, user: ctx.session.user },
+      auth: ctx.auth, // Updated to use Clerk auth
     },
   });
 });

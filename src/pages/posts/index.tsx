@@ -1,18 +1,36 @@
 import React, { useState } from 'react';
 import { api } from "~/utils/api"; 
-import { useSession } from 'next-auth/react';
-function CreatePostComponent() {
-  
-  const { data: sessionData } = useSession();
+import { GetServerSideProps } from 'next';
+import { getAuth, buildClerkProps } from '@clerk/nextjs/server';
 
+type FormData = {
+  userId: string;
+  description?: string;
+  brandTags: string[];
+  imageUrl: string;
+};
 
-  type FormData = {
-    userId: string;
-    description?: string;
-    brandTags: string[];
-    imageUrl: string;
-  };
+type Props = {
+  userId: string;
+};
 
+export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
+  const { userId } = getAuth(ctx.req);
+ 
+  if (!userId) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    };
+  }
+ 
+  // Load any data your application needs for the page using the userId
+  return { props: { ...buildClerkProps(ctx.req), userId } };
+};
+
+function CreatePostComponent({ userId }: Props) {
   
   const [formData, setFormData] = useState<FormData>({
     userId: '',
@@ -23,15 +41,15 @@ function CreatePostComponent() {
   
   const [tag, setTag] = useState('');
 
-const createPost = api.post.addPost.useMutation();
+  const createPost = api.post.addPost.useMutation();
 
-const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-  event.preventDefault();
-  console.log("session", sessionData?.user?.id)
-  formData.userId = sessionData?.user?.id || '';
-  createPost.mutate(formData);
-  // console.log(formData);
-};
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    console.log("session", userId)
+    formData.userId = userId || '';
+    createPost.mutate(formData);
+    // console.log(formData);
+  };
 
   const handleAddTag = () => {
     if (tag) {
