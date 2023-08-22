@@ -1,7 +1,5 @@
 import { type GetServerSidePropsContext } from "next";
 import { type DefaultSession } from "next-auth";
-import { env } from "~/env.mjs";
-import { prisma } from "~/server/db";
 import { getAuth, SignedInAuthObject, SignedOutAuthObject } from '@clerk/nextjs/server';
 
 declare module "next-auth" {
