@@ -3,7 +3,6 @@ import Head from "next/head";
 import { type NextPage } from "next";
 import { api } from "~/utils/api";
 import { useRouter } from "next/router";
-import Navbar from "~/components/NavBar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -57,7 +56,6 @@ const Signup: NextPage = () => {
         <link rel="icon" href="/00.png" />
       </Head>
       <main className="flex min-h-screen flex-col justify-center bg-black">
-        <Navbar />
         <section className="container mx-auto p-4">
           <div className="flex flex-col justify-center p-5 text-center">
             <h1 className="text-5xl text-stitched-pink">Create an Account</h1>

@@ -1,16 +1,27 @@
-import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
+import {
+  SignInButton,
+  SignUpButton,
+  UserButton,
+  useUser,
+} from "@clerk/nextjs";
 import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/router";
+import { useRouter } from 'next/router';
 
+/**
+ * Renders the navigation bar component.
+ * @returns {JSX.Element} The rendered navigation bar.
+ */
 function Navbar() {
+  // Define static styles for buttons
   const staticStyles =
     "inline-flex items-center justify-center text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-[#2e026d] hover:bg-white hover:cursor-pointer";
+  
+  // Get the user information
   const user = useUser();
   const router = useRouter();
-
   return (
     <nav className="sticky top-0 flex items-center justify-between bg-stitched-black p-6">
       {/* Logo */}
@@ -31,7 +42,7 @@ function Navbar() {
       {/* Search bar in center for /feed */}
       {user.isSignedIn && router.pathname === "/feed" && (
         <Input
-          className="w-52 rounded border border-pink-500 bg-transparent px-4 py-2 text-white placeholder-pink-500 md:w-64 lg:w-96"
+          className="text-white w-52 rounded border border-pink-500 bg-transparent px-4 py-2 placeholder-pink-500 md:w-64 lg:w-96"
           placeholder="Search"
         />
       )}
@@ -39,6 +50,7 @@ function Navbar() {
       {/* Buttons on the right */}
       <div className="flex gap-4">
         {user.isSignedIn ? (
+          // Render buttons for signed-in users
           <>
             <Link
               href="/home"
@@ -59,6 +71,7 @@ function Navbar() {
             <UserButton />
           </>
         ) : (
+          // Render buttons for non-signed-in users
           <>
             <SignInButton>
               <span
