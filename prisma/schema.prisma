@@ -76,7 +76,7 @@ model Post {
   description  String?
   brandTags    String[]
   imageUrl     String
-  likesCount   Int
+  likesCount   Int       @default(0)
   comments     Comment[]
   bookmarkedBy User[]    @relation("BookmarkedPosts")
   likedBy      Likes[]

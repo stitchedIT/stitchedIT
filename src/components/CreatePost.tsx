@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import { api } from "~/utils/api";
-import { GetServerSideProps } from "next";
-import { getAuth, buildClerkProps } from "@clerk/nextjs/server";
 import {supabase} from "supabaseClient.js";
 
 type FormData = {
@@ -15,20 +13,7 @@ type Props = {
   userId: string;
 };
 
-export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
-  const { userId } = getAuth(ctx.req);
 
-  if (!userId) {
-    return {
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
-    };
-  }
-
-  return { props: { ...buildClerkProps(ctx.req), userId } };
-};
 
 function CreatePostComponent({ userId }: Props) {
   const [formData, setFormData] = useState<FormData>({

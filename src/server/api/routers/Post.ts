@@ -28,18 +28,28 @@ export const postRouter = createTRPCRouter({
       });
     }),
 
-  deletePost: protectedProcedure
+    deletePost: protectedProcedure
     .input(
       z.object({
         postId: z.number(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      return await ctx.prisma.post.delete({
+      const existingPost = await ctx.prisma.post.findUnique({
         where: {
           id: input.postId,
         },
       });
+  
+      if (existingPost) {
+        return await ctx.prisma.post.delete({
+          where: {
+            id: input.postId,
+          },
+        });
+      } else {
+        throw new Error("Post not found"); // or handle the case when the post does not exist
+      }
     }),
 
   updatePost: protectedProcedure
@@ -63,10 +73,61 @@ export const postRouter = createTRPCRouter({
     }),
 
 
+  bookmarkPost: protectedProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        postId: z.number(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { userId, postId } = input;
 
+      // Check if the post is already bookmarked by the user
+      const existingBookmark = await ctx.prisma.post.findFirst({
+        where: {
+          id: postId,
+          bookmarkedBy: {
+            some: {
+              id: userId,
+            },
+          },
+        },
+      });
 
-
-
+      if (existingBookmark) {
+        // If the post is already bookmarked, you can either ignore or unbookmark it.
+        // For this example, let's unbookmark it:
+        await ctx.prisma.post.update({
+          where: {
+            id: postId,
+          },
+          data: {
+            bookmarkedBy: {
+              disconnect: {
+                id: userId,
+              },
+            },
+          },
+        });
+        return { status: "unbookmarked" };
+      } else {
+        // If the post is not bookmarked, bookmark it for the user
+        await ctx.prisma.post.update({
+          where: {
+            id: postId,
+          },
+          data: {
+            bookmarkedBy: {
+              connect: {
+                id: userId,
+              },
+            },
+          },
+        });
+        return { status: "bookmarked" };
+      }
+    }),
 
 
 
