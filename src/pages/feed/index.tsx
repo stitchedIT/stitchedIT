@@ -1,18 +1,46 @@
 import Head from "next/head";
-import { type NextPage } from "next";
+import { NextPage, GetServerSideProps } from "next";
 import React from "react";
+import CreatePost from "~/components/CreatePost";
+import PostList from "~/components/PostList";
+import { api } from "~/utils/api";
+import { getAuth, buildClerkProps } from "@clerk/nextjs/server";
+import {Post} from "~/types";
 
-const FeedPage: NextPage = () => {
-    return (
-        <>
-            <Head>
-                <title>Feed Page</title>
-                <meta name="description" content="An app to explore new clothes." />
-                <link rel="icon" href="/00.png" />
-            </Head>
-            <h1>This is the Feed page</h1>
-        </>
-    )
-}
+type Props = {
+  userId: string;
+  posts: Post[];
+};
+
+export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
+  const { userId } = getAuth(ctx.req);
+
+  if (!userId) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+
+  
+
+  return { props: { ...buildClerkProps(ctx.req), userId } };
+};
+
+const FeedPage: NextPage<Props> = ({ userId}) => {
+  return (
+    <>
+      <Head>
+        <title>Feed Page</title>
+        <meta name="description" content="An app to explore new clothes." />
+        <link rel="icon" href="/00.png" />
+      </Head>
+      <CreatePost userId={userId} />
+      <PostList userId={userId}  />
+    </>
+  );
+};
 
 export default FeedPage;
