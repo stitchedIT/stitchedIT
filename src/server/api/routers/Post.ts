@@ -51,7 +51,21 @@ export const postRouter = createTRPCRouter({
         throw new Error("Post not found"); // or handle the case when the post does not exist
       }
     }),
-
+    addComment: protectedProcedure.input(
+      z.object({
+        postId: z.number(),
+        content: z.string(),
+        userId: z.string(),
+      })
+    ).mutation(async ({ input, ctx }) => {
+      return await ctx.prisma.comment.create({
+        data: {
+          postId: input.postId,
+          content: input.content,
+          userId: input.userId,
+        },
+      });
+    }),
   updatePost: protectedProcedure
     .input(
       z.object({
@@ -128,11 +142,6 @@ export const postRouter = createTRPCRouter({
         return { status: "bookmarked" };
       }
     }),
-
-
-
-
-
 
   // Get all posts
   getAllPosts: protectedProcedure.query(({ ctx }) => {
