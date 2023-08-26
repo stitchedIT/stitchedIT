@@ -14,18 +14,16 @@ function PostList({ userId }: Props) {
   let postsData = posts.data
   const createLike = api.post.toggleLike.useMutation();
   const createComment = api.post.addComment.useMutation(); 
-  console.log(postsData)
 
   const [comment, setComment] = useState('');
-  const [likes, setLikes] = useState(0);
+
   const handleLike = (userId: string, id: number) => {
-    console.log('liked');
     createLike.mutate({
       userId: userId,
       postId: id,
     })
-    // setLikes();
   }
+
   const handleComment = (userId: string, id: number) => {
     createComment.mutate({
       userId: userId,
