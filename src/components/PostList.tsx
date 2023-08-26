@@ -13,6 +13,7 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
   const createLike = api.post.toggleLike.useMutation();
   const createComment = api.post.addComment.useMutation(); 
   const deletePost = api.post.deletePost.useMutation();
+  const savePost = api.post.bookmarkPost.useMutation();
   const [comment, setComment] = useState('');
 
   const handleLike = (id: number) => {
@@ -26,6 +27,13 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
      postId: id
    })
  }
+ const handleSave = (id: number) => {
+   savePost.mutate({
+     userId: userId,
+     postId: id
+   })
+ }
+
   const handleComment = (id: number) => {
     createComment.mutate({
       userId: userId,
@@ -41,7 +49,7 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
       <img src={post.imageUrl} alt="post" />
       <p>{post.brandTags}</p>
       <p>{post.likesCount}</p>
-      <Button className="bg-stitched-lightPink" variant="outline">Save</Button>
+      <Button className="bg-stitched-lightPink" variant="outline" onClick={() => handleSave(post.id)}>Save</Button>
       <Button variant="outline" className="bg-stitched-lightPink" onClick={() => handleLike(post.id)}>Like</Button>
       <Button variant="outline" className="bg-stitched-lightPink" onClick={() => handleDelete(post.id)}>Delete</Button>
       <input
