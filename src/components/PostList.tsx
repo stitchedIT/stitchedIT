@@ -1,32 +1,28 @@
-import { Post } from "~/types";
+import { Post as PostType } from "~/types";
 import { api } from "~/utils/api";
 import { useState } from "react";
 import {Button} from "@/components/ui/button";
 import { getAuth, buildClerkProps } from "@clerk/nextjs/server";
 
-type Props = {
-  // posts: Post[];
-  userId: string
+type PostProps = {
+  post: PostType;
+  userId: string;
 };
 
-function PostList({ userId }: Props) {
-  const posts = api.post.getAllPosts.useQuery();
-  let postsData = posts.data
+const Post: React.FC<PostProps> = ({ post, userId }) => {
   const createLike = api.post.toggleLike.useMutation();
   const createComment = api.post.addComment.useMutation(); 
-  console.log(postsData)
 
   const [comment, setComment] = useState('');
-  const [likes, setLikes] = useState(0);
-  const handleLike = (userId: string, id: number) => {
-    console.log('liked');
+
+  const handleLike = (id: number) => {
     createLike.mutate({
       userId: userId,
       postId: id,
     })
-    // setLikes();
   }
-  const handleComment = (userId: string, id: number) => {
+
+  const handleComment = (id: number) => {
     createComment.mutate({
       userId: userId,
       postId: id,
@@ -36,23 +32,36 @@ function PostList({ userId }: Props) {
   }
 
   return (
+    <div key={post.id}>
+      <h3>{post.description}</h3>
+      <img src={post.imageUrl} alt="post" />
+      <p>{post.brandTags}</p>
+      <p>{post.likesCount}</p>
+      <Button className="bg-stitched-lightPink" variant="outline">Save</Button>
+      <Button variant="outline" className="bg-stitched-lightPink" onClick={() => handleLike(post.id)}>Like</Button>
+      <input
+        type="text"
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        placeholder="Write a comment..."
+      />
+      <Button className="bg-stitched-lightPink" variant="outline" onClick={() => handleComment(post.id)}>Comment</Button>
+    </div>
+  );
+}
+
+type PostListProps = {
+  userId: string
+};
+
+function PostList({ userId }: PostListProps) {
+  const posts = api.post.getAllPosts.useQuery();
+  let postsData = posts.data
+
+  return (
     <div>
-      {postsData?.map(({id, description, brandTags, imageUrl, likesCount}) => (
-        <div key={id}>
-          <h3>{description}</h3>
-          <img src={imageUrl} alt="post" />
-          <p>{brandTags}</p>
-          <p>{likesCount}</p>
-          <Button className="bg-stitched-lightPink" variant="outline">Save</Button>
-          <Button variant="outline" className="bg-stitched-lightPink" onClick={() => handleLike(userId, id)}>Like</Button>
-          <input
-            type="text"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder="Write a comment..."
-          />
-          <Button className="bg-stitched-lightPink" variant="outline" onClick={() => handleComment(userId, id)}>Comment</Button>
-        </div>
+      {postsData?.map((post) => (
+        <Post key={post.id} post={post} userId={userId} />
       ))}
     </div>
   );
