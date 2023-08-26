@@ -30,7 +30,7 @@ function CreatePostComponent({ userId }: Props) {
     
     if (!postFile) return;
 
-    const path = `posts/${postFile.name}`;
+    const path = `feed/${postFile.name}`;
     
     const { error } = await supabase
       .storage
