@@ -42,7 +42,7 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
     })
     setComment('');
   }
-
+const isOwner = userId === post.userId;
   return (
     <div key={post.id}>
       <h3>{post.description}</h3>
@@ -51,7 +51,7 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
       <p>{post.likesCount}</p>
       <Button className="bg-stitched-lightPink" variant="outline" onClick={() => handleSave(post.id)}>Save</Button>
       <Button variant="outline" className="bg-stitched-lightPink" onClick={() => handleLike(post.id)}>Like</Button>
-      <Button variant="outline" className="bg-stitched-lightPink" onClick={() => handleDelete(post.id)}>Delete</Button>
+    {isOwner &&  <Button variant="outline" className="bg-stitched-lightPink" onClick={() => handleDelete(post.id)}>Delete</Button>}
       <input
         type="text"
         value={comment}
