@@ -147,16 +147,32 @@ export const postRouter = createTRPCRouter({
   getAllPosts: protectedProcedure.query(({ ctx }) => {
     return ctx.prisma.post.findMany();
   }),
-  // getBookmarkedPosts: protectedProcedure.query(({ ctx }) => {
-  //   return ctx.prisma.post.findMany({
-  //     where: {
-  //       bookmarkedBy: {
-  //         some: {
-  //           id: ctx.session.user.id,
-  //         },
-  //       },
-  //     },
-  //   })}),
+  getBookmarkedPosts: protectedProcedure.input(
+    z.object({
+      userId: z.string(),
+    })  ).query(({ input, ctx }) => {
+      return ctx.prisma.post.findMany({
+        where: {
+          bookmarkedBy: {
+            some: {
+              id: input.userId,
+            },
+          },
+        },
+      });
+    }),
+  deleteComment: protectedProcedure 
+  .input(
+    z.object({
+      postId: z.number(),
+      commentId: z.number(),
+    })  ).mutation(async ({ input, ctx }) => {
+      return await ctx.prisma.comment.delete({
+        where: {
+          id: input.commentId,
+        },
+      });
+    }),
   getAllPostsByUser: publicProcedure
     .input(z.object({ userId: z.string() }))
     .query(({ input, ctx }) => {

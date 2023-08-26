@@ -45,8 +45,8 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
 const isOwner = userId === post.userId;
   return (
     <div key={post.id}>
-      <h3>{post.description}</h3>
       <img src={post.imageUrl} alt="post" />
+      <h3>{post.description}</h3>
       <p>{post.brandTags}</p>
       <p>{post.likesCount}</p>
       <Button className="bg-stitched-lightPink" variant="outline" onClick={() => handleSave(post.id)}>Save</Button>
