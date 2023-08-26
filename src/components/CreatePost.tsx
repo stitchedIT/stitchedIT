@@ -13,8 +13,6 @@ type Props = {
   userId: string;
 };
 
-
-
 function CreatePostComponent({ userId }: Props) {
   const [formData, setFormData] = useState<FormData>({
     userId: "",
