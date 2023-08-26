@@ -29,9 +29,8 @@ function Navbar() {
     <nav className="sticky top-0 flex items-center justify-between bg-stitched-black p-6">
       {/* Logo */}
       <div className="flex items-center">
-        <Avatar className="mr-6 flex items-center text-stitched-pink cursor-pointer">
+        <Avatar className="mr-6 flex items-center text-stitched-pink cursor-pointer" onClick = {() => handleHomeClick()}>
           <AvatarImage
-            onClick = {() => handleHomeClick()}
             className="w-[60px]"
             src="/00.png"
             alt="stitchedIT logo"
