@@ -3,6 +3,11 @@ import Head from "next/head";
 import Image from "next/image";
 import { type NextPage } from "next";
 
+
+// Components
+import Navbar from "~/components/NavBar";
+import SwipeableComponent from "~/components/SwipeableComponent";
+
 const HomePage: NextPage = () => {
   
   return (
@@ -21,6 +26,7 @@ const HomePage: NextPage = () => {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8"></div>
           <div className="flex flex-col items-center gap-2">
             <Image width={250} height={250} src={`/00.png`} alt="stitchedIT" />
+            <SwipeableComponent/>
           </div>
         </div>
       </main>

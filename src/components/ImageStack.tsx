@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { BlobServiceClient, AnonymousCredential } from "@azure/storage-blob";
 
 interface ImageData {
   name: string;
+  path: string;
 }
 
 interface ImageStackProps {
@@ -10,18 +12,28 @@ interface ImageStackProps {
 }
 
 const ImageStack = ({ imageIndex }: ImageStackProps) => {
-  const [imageNames, setImageNames] = useState<string[]>([]);
+  const [imageData, setImageData] = useState<ImageData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const response = await fetch(
-          "https://api.github.com/repos/ThyDrSlen/orwell-scraper/contents/shoes"
+        const blobServiceClient = new BlobServiceClient(
+          `https://imagesitems.blob.core.windows.net/`,
+          new AnonymousCredential()
         );
-        const data: ImageData[] = (await response.json()) as ImageData[];
-        const imageNames = data.map((item) => item.name);
-        setImageNames(imageNames);
+  
+        const containerClient = blobServiceClient.getContainerClient("images");
+  
+        let images = [];
+        for await (const blob of containerClient.listBlobsFlat()) {
+          // Only push blobs that have a .png extension
+          if (blob.name.toLowerCase().endsWith('.png')) {
+            images.push({ name: blob.name, path: blob.name });
+          }
+        }
+  
+        setImageData(images);
         setIsLoading(false);
       } catch (error) {
         console.error(error);
@@ -34,16 +46,17 @@ const ImageStack = ({ imageIndex }: ImageStackProps) => {
     return <p>Loading...</p>;
   }
 
-  const imageName = imageNames[imageIndex] || '';
+  const imageName = imageData[imageIndex]?.name || '';
 
   return (
     <div>
       <p>{imageName.split(".")[0]}</p>
+      
       <Image
-        width={275}
-        height={275}
+        width={300 }
+        height={300}
         draggable={false}
-        src={`https://raw.githubusercontent.com/ThyDrSlen/orwell-scraper/main/shoes/${imageName}`}
+        src={`https://imagesitems.blob.core.windows.net/images/${imageName}`}
         alt="stacked image"
       />
     </div>

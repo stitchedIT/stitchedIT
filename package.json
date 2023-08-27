@@ -11,6 +11,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@azure/storage-blob": "^12.15.0",
     "@clerk/nextjs": "^4.23.2",
     "@hookform/resolvers": "^3.2.0",
     "@next-auth/prisma-adapter": "^1.0.5",
