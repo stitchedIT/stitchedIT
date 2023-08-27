@@ -4,6 +4,11 @@ import Image from "next/image";
 import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 
+
+// Components
+import Navbar from "~/components/NavBar";
+import SwipeableComponent from "~/components/SwipeableComponent";
+
 const HomePage: NextPage = () => {
   return (
     <>
