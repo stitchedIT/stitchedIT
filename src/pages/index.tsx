@@ -8,6 +8,7 @@ import Link from "next/link";
 // Components
 import Navbar from "~/components/NavBar";
 import SwipeableComponent from "~/components/SwipeableComponent";
+import Footer from "~/components/Footer";
 
 const HomePage: NextPage = () => {
   return (
@@ -55,6 +56,7 @@ const HomePage: NextPage = () => {
           />
         </div>
       </main>
+      <Footer />
     </>
   );
 };
