@@ -66,6 +66,19 @@ export const postRouter = createTRPCRouter({
         },
       });
     }),
+    getCommentsByPostId: protectedProcedure .input(
+      z.object({
+        postId: z.number(),
+      })  ).query(async ({ input, ctx }) => {
+      return await ctx.prisma.comment.findMany({
+        where: {
+          postId: input.postId,
+        },
+        include: {
+          user: true,
+        },
+      })
+    }),
   updatePost: protectedProcedure
     .input(
       z.object({

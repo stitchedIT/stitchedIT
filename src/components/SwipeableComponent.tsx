@@ -62,6 +62,7 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
 
   const recommendationAdd = api.clothingItem.addRecommendation.useMutation();
   const addClothingItem = api.clothingItem.addClothingItem.useMutation();
+  const checkExistingClothingItem = api.clothingItem.getItemByImageURL.useQuery();
 
   const onSwipe = (direction: string) => {
     let feedback = "";
@@ -72,43 +73,62 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
       setDislikes((prevDislikes) => prevDislikes + 1);
       feedback = "dislike";
     }
-
+  
     const actualUserId = userId?.userId;
-
+  
     if (actualUserId && typeof actualUserId === "string") {
       // Extract properties from the current image name
-      const clothingItemData: any = extractPropertiesFromImageName(currentImageName);
-
+      const clothingItemData: any =
+        extractPropertiesFromImageName(currentImageName);
+  
       if (clothingItemData) {
-        // Call the tRPC procedure to add a new clothing item
-        addClothingItem.mutate(
-          {
-            brand: clothingItemData.brand,
-            type: clothingItemData.type,
-            color: clothingItemData.color,
-            description: clothingItemData.description,
+        // Call the tRPC procedure to check if a clothing item with the same image URL already exists
+        checkExistingClothingItem
+          .query({
             imageUrl: `https://imagesitems.blob.core.windows.net/images/${currentImageName}`,
-          },
-          {
-            onSuccess: (data) => {
-              // If the clothing item was added successfully, add a recommendation
+          })
+          .then((existingClothingItem) => {
+            if (existingClothingItem) {
+              // If the clothing item already exists, add a recommendation
               recommendationAdd.mutate({
                 userId: actualUserId,
-                clothingItemId: data.id, // Assuming the tRPC procedure returns the new clothing item's ID
+                clothingItemId: existingClothingItem.id,
                 feedback: feedback,
               });
-            },
-            onError: (error) => {
-              console.error("Error adding clothing item:", error);
-            },
-          }
-        );
+            } else {
+              // If the clothing item doesn't exist, call the tRPC procedure to add a new clothing item
+              addClothingItem.mutate(
+                {
+                  brand: clothingItemData.brand,
+                  type: clothingItemData.type,
+                  color: clothingItemData.color,
+                  description: clothingItemData.description,
+                  imageUrl: `https://imagesitems.blob.core.windows.net/images/${currentImageName}`,
+                },
+                {
+                  onSuccess: (data) => {
+                    // If the clothing item was added successfully, add a recommendation
+                    recommendationAdd.mutate({
+                      userId: actualUserId,
+                      clothingItemId: data.id,
+                      feedback: feedback,
+                    });
+                  },
+                  onError: (error) => {
+                    console.error("Error adding clothing item:", error);
+                  },
+                }
+              );
+            }
+          })
+          .catch((error) => {
+            console.error("Error checking for existing clothing item:", error);
+          });
       }
     } else {
       console.error("Unable to extract userId:", userId);
     }
   };
-
   const onCardLeftScreen = (myIdentifier: string) => {
     console.log(myIdentifier + " left the screen");
     handleNextImage(); // Simulate a click on the next button
