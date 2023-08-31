@@ -9,8 +9,8 @@ import {Post} from "~/types";
 
 type Props = {
   userId: string;
-  posts: Post[];
 };
+
 
 export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
   const { userId } = getAuth(ctx.req);
@@ -23,9 +23,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
       },
     };
   }
-
-  
-
   return { props: { ...buildClerkProps(ctx.req), userId } };
 };
 

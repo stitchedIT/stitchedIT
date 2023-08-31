@@ -4,6 +4,7 @@ import { postRouter } from "./routers/post";
 import {userRouter} from "./routers/user"
 import {commentsRouter} from "./routers/comments"
 import {recommendationRouter} from "./routers/recommendation"
+import {clothingItemRouter} from "./routers/clothingItem"
 /**
  * This is the primary router for your server.
  *
@@ -15,8 +16,7 @@ export const appRouter = createTRPCRouter({
   user: userRouter,
   comments:commentsRouter,
   recommendation:recommendationRouter,
-  
-
+  clothingItem:clothingItemRouter
   
 });
 

@@ -73,7 +73,7 @@ model Post {
   id           Int       @id @default(autoincrement())
   userId       String
   user         User      @relation(fields: [userId], references: [id])
-  description  String?
+  description  String
   brandTags    String[]
   imageUrl     String
   likesCount   Int       @default(0)
@@ -98,8 +98,8 @@ model ClothingItem {
   id              Int              @id @default(autoincrement())
   brand           String
   type            String
-  color           String?
-  description     String?
+  color           String
+  description     String
   imageUrl        String
   linkUrl         String?
   recommendations Recommendation[]

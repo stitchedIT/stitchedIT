@@ -2,13 +2,31 @@
 import Head from "next/head";
 import Image from "next/image";
 import { type NextPage } from "next";
-
-
+import { getAuth, buildClerkProps } from "@clerk/nextjs/server";
+import { GetServerSidePropsContext } from "next";
+import { type GetServerSideProps } from "next";
 // Components
 import Navbar from "~/components/NavBar";
 import SwipeableComponent from "~/components/SwipeableComponent";
+type SwitchProps = {
+  userId: string;
+}
+export const getServerSideProps: GetServerSideProps<SwitchProps> = async (ctx:GetServerSidePropsContext) => {
+  // const { userId } = getAuth(ctx.req);
+  const { userId } = getAuth(ctx.req);
+  if (!userId) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+  
+  return { props: { ...buildClerkProps(ctx.req), userId } };
+};
 
-const HomePage: NextPage = () => {
+const HomePage: NextPage = (userId: any) => {
   
   return (
     <>
@@ -26,7 +44,7 @@ const HomePage: NextPage = () => {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8"></div>
           <div className="flex flex-col items-center gap-2">
             <Image width={250} height={250} src={`/00.png`} alt="stitchedIT" />
-            <SwipeableComponent/>
+            <SwipeableComponent userId={userId}/>
           </div>
         </div>
       </main>

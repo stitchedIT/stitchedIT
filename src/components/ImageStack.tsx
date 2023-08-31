@@ -6,14 +6,15 @@ interface ImageData {
   name: string;
   path: string;
 }
-
 interface ImageStackProps {
   imageIndex: number;
+  onImageNameChange: (imageName: string) => void; // Add this line
 }
+
 
 const BATCH_SIZE = 10;
 
-const ImageStack = ({ imageIndex }: ImageStackProps) => {
+const ImageStack = ({ imageIndex, onImageNameChange }: ImageStackProps) => {
   const [imageData, setImageData] = useState<ImageData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentBatchIndex, setCurrentBatchIndex] = useState(0);
@@ -55,6 +56,8 @@ const ImageStack = ({ imageIndex }: ImageStackProps) => {
     fetchImages(0);
   }, []);
 
+  
+
   useEffect(() => {
     if (imageIndex >= (currentBatchIndex + 1) * BATCH_SIZE - 5) {
       setCurrentBatchIndex(prev => prev + 1);
@@ -62,11 +65,17 @@ const ImageStack = ({ imageIndex }: ImageStackProps) => {
     }
   }, [imageIndex]);
 
-  const imageName = imageData[imageIndex]?.name || '';
-
+  const imageDataItem = imageData[imageIndex];
+  const imageName = imageDataItem?.name;
+  useEffect(() => {
+    if (imageName) {
+        onImageNameChange(imageName);
+    }
+  }, [imageName]);
+  console.log(imageName);
   return (
     <div>
-      <p>{imageName.split(".")[0]}</p>
+      {imageName && <p>{imageName.split(".")[0]}</p>}
       <Image
         width={300}
         height={300}
@@ -77,5 +86,6 @@ const ImageStack = ({ imageIndex }: ImageStackProps) => {
     </div>
   );
 };
+
 
 export default ImageStack;
