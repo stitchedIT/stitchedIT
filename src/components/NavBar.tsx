@@ -9,27 +9,48 @@ import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { useRouter } from 'next/router';
+import { useState } from "react";
 
 /**
  * Renders the navigation bar component.
  * @returns {JSX.Element} The rendered navigation bar.
  */
 function Navbar() {
+  // State to control the visibility of the side menu
+  const [isMenuVisible, setMenuVisible] = useState(false);
+
+
+  // Function to toggle the side menu visibility
+  const toggleMenu = () => {
+    setMenuVisible(!isMenuVisible);
+  };
+
   // Define static styles for buttons
   const staticStyles =
     "inline-flex items-center justify-center text-sm px-4 py-2 leading-none border rounded  text-stitched-pink border-stitched-pink hover:border-transparent hover:text-stitched-pink hover:bg-white hover:cursor-pointer";
-  
+
   // Get the user information
   const user = useUser();
   const router = useRouter();
   const handleHomeClick = () => {
     router.push("/home");
-  }
+  };
   return (
     <nav className="sticky top-0 flex items-center justify-between bg-stitched-black p-6">
-      {/* Logo */}
       <div className="flex items-center">
-        <Avatar className="mr-6 flex items-center text-stitched-pink cursor-pointer" onClick = {() => handleHomeClick()}>
+        {/* Hamburger Button for mobile view */}
+        <button
+          className="mr-6 text-3xl text-white lg:hidden"
+          onClick={toggleMenu}
+        >
+          &#9776;
+        </button>
+
+        {/* Logo */}
+        <Avatar
+          className="mr-6 flex cursor-pointer items-center text-stitched-pink"
+          onClick={handleHomeClick}
+        >
           <AvatarImage
             className="w-[60px]"
             src="/00.png"
@@ -42,18 +63,54 @@ function Navbar() {
         </Avatar>
       </div>
 
-      {/* Search bar in center for /feed */}
+      {/* Search bar for /feed */}
       {user.isSignedIn && router.pathname === "/feed" && (
         <Input
-          className="text-white w-52 rounded border border-pink-500 bg-transparent px-4 py-2 placeholder-pink-500 md:w-64 lg:w-96"
+          className="w-52 rounded border border-pink-500 bg-transparent px-4 py-2 text-white placeholder-pink-500 md:w-64 lg:w-96"
           placeholder="Search"
         />
       )}
 
-      {/* Buttons on the right */}
-      <div className="flex gap-4">
+      {/* Side Menu for Mobile */}
+      <div
+        className={`fixed left-0 top-0 h-full w-[40%] transform bg-stitched-black bg-opacity-80 text-white backdrop-blur-[15px]
+ transition-transform duration-300 ${
+          isMenuVisible ? "translate-x-0" : "-translate-x-full"
+        } lg:hidden`}
+      >
+        <button
+          className="absolute right-4 top-4 text-2xl"
+          onClick={toggleMenu}
+        >
+          &#10005;
+        </button>
+        <div className="flex h-full flex-col items-center justify-center space-y-4">
+          {user.isSignedIn ? (
+            <>
+              <Link href="/home" onClick={toggleMenu}>
+                Home
+              </Link>
+              <Link href="/feed" onClick={toggleMenu}>
+                Feed
+              </Link>
+              <Link href="/bookmarks" onClick={toggleMenu}>
+                Bookmarks
+              </Link>
+              {/* If UserButton causes a navigation change, you might also want to toggle the menu there. */}
+              <UserButton onClick={toggleMenu} />
+            </>
+          ) : (
+            <>
+              <SignInButton onClick={toggleMenu}>Login</SignInButton>
+              <SignUpButton onClick={toggleMenu}>Sign Up</SignUpButton>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Desktop Buttons */}
+      <div className="hidden gap-4 lg:flex">
         {user.isSignedIn ? (
-          // Render buttons for signed-in users
           <>
             <Link
               href="/home"
@@ -82,7 +139,6 @@ function Navbar() {
             <UserButton />
           </>
         ) : (
-          // Render buttons for non-signed-in users
           <>
             <SignInButton>
               <span
