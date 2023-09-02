@@ -4,7 +4,7 @@ import {supabase} from "supabaseClient.js";
 
 type FormData = {
   userId: string;
-  description?: string;
+  description: string;
   brandTags: string;
   imageUrl: string;
 };
@@ -16,7 +16,7 @@ type Props = {
 function CreatePostComponent({ userId }: Props) {
   const [formData, setFormData] = useState<FormData>({
     userId: "",
-    description: undefined,
+    description: "",
     brandTags: "",
     imageUrl: "",
   });

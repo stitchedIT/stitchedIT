@@ -63,7 +63,7 @@ model User {
   posts         Post[]
   comments      Comment[]
   sessions        Session[]
-  recommendations Recommendation[]
+  feedback Feedback[]
   bookmarkedPosts Post[] @relation("BookmarkedPosts")
   wishlist      ClothingItem[] @relation("UserWishlist")
   likes         Likes[]
@@ -73,7 +73,7 @@ model Post {
   id           Int       @id @default(autoincrement())
   userId       String
   user         User      @relation(fields: [userId], references: [id])
-  description  String?
+  description  String
   brandTags    String[]
   imageUrl     String
   likesCount   Int       @default(0)
@@ -98,16 +98,17 @@ model ClothingItem {
   id              Int              @id @default(autoincrement())
   brand           String
   type            String
-  color           String?
-  description     String?
+  color           String
+  description     String
+  category        String
   imageUrl        String
   linkUrl         String?
-  recommendations Recommendation[]
+  feedback Feedback[]
   wishedBy        User[]           @relation("UserWishlist")
   createdAt       DateTime         @default(now())
 }
 
-model Recommendation {
+model Feedback {
   id             Int          @id @default(autoincrement())
   userId         String
   user           User         @relation(fields: [userId], references: [id])
