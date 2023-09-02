@@ -32,8 +32,8 @@ function Navbar() {
   // Get the user information
   const user = useUser();
   const router = useRouter();
-  const handleHomeClick = () => {
-    router.push("/home");
+  const handleLandingClick = () => {
+    router.push("/");
   };
   return (
     <nav className="sticky top-0 flex items-center justify-between bg-stitched-black p-6">
@@ -49,7 +49,7 @@ function Navbar() {
         {/* Logo */}
         <Avatar
           className="mr-6 flex cursor-pointer items-center text-stitched-pink"
-          onClick={handleHomeClick}
+          onClick={handleLandingClick}
         >
           <AvatarImage
             className="w-[60px]"

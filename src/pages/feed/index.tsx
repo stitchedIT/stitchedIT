@@ -29,7 +29,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
   return { props: { ...buildClerkProps(ctx.req), userId } };
 };
 
-const FeedPage: NextPage<Props> = ({ userId}) => {
+const FeedPage: NextPage<Props> = ({ userId }) => {
   return (
     <>
       <Head>
