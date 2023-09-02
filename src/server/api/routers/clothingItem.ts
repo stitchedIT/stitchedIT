@@ -6,95 +6,59 @@ import {
 } from "~/server/api/trpc";
 
 export const clothingItemRouter = createTRPCRouter({
-  // Create new clothing item
-  addClothingItem: protectedProcedure
-    .input(
-      z.object({
-        brand: z.string(),
-        type: z.string(),
-        color: z.optional(z.string()),
-        description: z.optional(z.string()),
-        imageUrl: z.string(),
-        linkUrl: z.optional(z.string()),
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      const clothingItem = await ctx.prisma.clothingItem.create({
-        data: {
-          ...input,
-        },
-      });
-      return clothingItem;
-    }),
-
-  getItemByImageURL: publicProcedure
-    .input(
-      z.object({
-        id: z.number(),
-        imageUrl: z.string(),
-      })
-    )
-    .query(async ({ input, ctx }) => {
-      const clothingItem = await ctx.prisma.clothingItem.findUnique({
-        where: {
-          id: input.id,
-          imageUrl: input.imageUrl,
-        },
-      });
-      return clothingItem;
-    }),
-  // Add a recommendation
-  addRecommendation: protectedProcedure
+  getRecommendedItems: protectedProcedure
     .input(
       z.object({
         userId: z.string(),
-        clothingItemId: z.optional(z.number()),
+        limit: z.number(),
+        offset: z.number().default(0),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      // Get items the user has already given feedback on
+      const feedbackItems = await ctx.prisma.feedback.findMany({
+        where: { userId: input.userId },
+        select: { clothingItemId: true },
+      });
+      const itemIdsWithFeedback = feedbackItems.map(
+        (item) => item.clothingItemId
+      );
+
+      // Fetch items not yet shown to the user, based on some recommendation logic
+      // For simplicity, we're just avoiding items they've already seen
+      const recommendedItems = await ctx.prisma.clothingItem.findMany({
+        where: {
+          NOT: { id: { in: itemIdsWithFeedback } },
+        },
+        take: input.limit,
+        skip: input.offset, // Add this line
+        // Optionally, add more ordering logic based on other recommendation criteria
+      });
+
+      return recommendedItems;
+    }),
+
+  // Add a recommendation
+  addFeedback: protectedProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        clothingItemId: z.number(),
         feedback: z.string(),
-        // If clothingItemId is not provided, we require details to create a new clothing item
-        clothingItem: z.optional(
-          z.object({
-            brand: z.string(),
-            type: z.string(),
-            color: z.optional(z.string()),
-            description: z.optional(z.string()),
-            imageUrl: z.string(),
-            linkUrl: z.optional(z.string()),
-          })
-        ),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      let clothingItemId = input.clothingItemId;
-
-      // If clothingItemId is not provided, create a new clothing item first
-      if (!clothingItemId && input.clothingItem) {
-        const newClothingItem = await ctx.prisma.clothingItem.create({
-          data: {
-            ...input.clothingItem,
-          },
-        });
-        clothingItemId = newClothingItem.id;
-      }
-
-      if (!clothingItemId) {
-        throw new Error("Missing clothing item details");
-      }
-
-      // Create the recommendation
-      const recommendation = await ctx.prisma.recommendation.create({
+      return await ctx.prisma.feedback.create({
         data: {
           userId: input.userId,
-          clothingItemId,
+          clothingItemId: input.clothingItemId,
           feedback: input.feedback,
         },
       });
-
-      return recommendation;
     }),
-
-  // Fetch all recommendations
-  getAllRecommendations: protectedProcedure.query(async ({ ctx }) => {
-    const recommendations = await ctx.prisma.recommendation.findMany();
+  // Fetch all feedback
+  getAllFeedback: protectedProcedure.query(async ({ ctx }) => {
+    const recommendations = await ctx.prisma.feedback.findMany();
     return recommendations;
   }),
 });
