@@ -255,16 +255,6 @@ export const postRouter = createTRPCRouter({
         });
       }
 
-      const updatedPost = await ctx.prisma.post.findUnique({
-        where: {
-          id: postId,
-        },
-        select: {
-          likesCount: true,
-        },
-      });
-  
-      // Return the updated likesCount
-      return updatedPost?.likesCount || 0;
+      return true;
     }),
 });

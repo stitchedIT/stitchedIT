@@ -1,6 +1,6 @@
 import { Post as PostType } from "~/types";
 import { api } from "~/utils/api";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {Button} from "@/components/ui/button";
 import { getAuth, buildClerkProps } from "@clerk/nextjs/server";
 
@@ -16,37 +16,16 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
   const deleteComment = api.post.deleteComment.useMutation();
   const savePost = api.post.bookmarkPost.useMutation();
   const [comment, setComment] = useState('');
-  let commentsQuery = api.post.getCommentsByPostId.useQuery({ postId: post.id });
+  const commentsQuery = api.post.getCommentsByPostId.useQuery({ postId: post.id });
   const [clickCount, setClickCount] = useState(2);
   const [comments, setComments] = useState<any[]>(commentsQuery.data ? [...commentsQuery.data] : []);
-  const [likesCount, setLikesCount] = useState(post.likesCount);
-  const [likeClick, setLikeClick] = useState(0);
-  //problem is the likes count is not updating
-  // console.log("likes reg", post.likesCount)
-  // useEffect(() => {
-  //   console.log('Likes updated to:', likesCount)
-  //   console.log("neww", post.likesCount)
-  // }, [likeClick])
-  // const handleLike = (id: number) => {
-  //   createLike.mutate({
-  //     userId: userId,
-  //     postId: id,
-  //   })
-  //   console.log("new", post.likesCount)
-  //   setLikeClick(likeClick + 1);
-  //   setLikesCount(post.likesCount);
-  // }
+
   const handleLike = (id: number) => {
     createLike.mutate({
       userId: userId,
       postId: id,
-    }, {
-      onSuccess: (data) => {
-        setLikesCount(data);
-      }
-    });
+    })
   }
-  
  const handleDelete = (id: number) => {
    deletePost.mutate({
      postId: id
@@ -63,7 +42,15 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
      userId: userId,
      postId: id
    })
-  }
+ }
+//  const handleViewComments = (id: number) => {
+//   setClickCount(clickCount + 1);
+//   if(clickCount % 2 === 0){ // Show comments when view comments is clicked
+//     setShowComments(true);
+//   } else {
+//     setShowComments(false);
+//   };
+// };
 const handleViewComments = (id: number) => {
   setClickCount(clickCount + 1);
   setShowComments(clickCount % 2 === 0);
@@ -77,13 +64,22 @@ const handleComment = (id: number) => {
   setComment('');
   setComments([...comments, { id: comments.length + 1, content: comment }]);
 };
+  // const handleComment = (id: number) => {
+  //   createComment.mutate({
+  //     userId: userId,
+  //     postId: id,
+  //     content: comment,
+  //   })
+  //   setComment('');
+
+  // }
 const isOwner = userId === post.userId;
   return (
     <div key={post.id}>
       <img src={post.imageUrl} alt="post" />
       <h3>{post.description}</h3>
       <p>{post.brandTags}</p>
-      <p>{likesCount}</p>
+      <p>{post.likesCount}</p>
       <Button className="bg-stitched-lightPink" variant="outline" onClick={() => handleSave(post.id)}>Save</Button>
       <Button variant="outline" className="bg-stitched-lightPink" onClick={() => handleLike(post.id)}>Like</Button>
     {isOwner &&  <Button variant="outline" className="bg-stitched-lightPink" onClick={() => handleDelete(post.id)}>Delete</Button>}
@@ -111,7 +107,7 @@ const isOwner = userId === post.userId;
 
 function PostList({ userId }: PostListProps) {
   const posts = api.post.getAllPosts.useQuery();
-  let postsData = posts.data;
+  let postsData = posts.data
 
   return (
     <div>
