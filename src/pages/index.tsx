@@ -1,5 +1,10 @@
 import Head from "next/head";
 import { type NextPage } from "next";
+import { getAuth, buildClerkProps } from "@clerk/nextjs/server";
+import { GetServerSidePropsContext } from "next";
+import { type GetServerSideProps } from "next";
+
+import Footer from "~/components/Footer";  
 import Image from "next/image";
 import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
@@ -7,9 +12,28 @@ import Link from "next/link";
 // Components
 import Navbar from "~/components/NavBar";
 import SwipeableComponent from "~/components/SwipeableComponent";
-import Footer from "~/components/Footer";
 
-const HomePage: NextPage = () => {
+type SwitchProps = {
+  userId: string;
+};
+export const getServerSideProps: GetServerSideProps<SwitchProps> = async (
+  ctx: GetServerSidePropsContext
+) => {
+  // const { userId } = getAuth(ctx.req);
+  const { userId } = getAuth(ctx.req);
+  if (!userId) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+
+  return { props: { ...buildClerkProps(ctx.req), userId } };
+};
+
+const HomePage: NextPage = (userId: any) => {
   return (
     <>
       <Head>
@@ -23,10 +47,14 @@ const HomePage: NextPage = () => {
           <h1 className="text-4xl font-bold text-stitched-pink sm:text-5xl md:text-4xl lg:text-6xl">
             Discover a world of fashion inspiration.
           </h1>
-          {/* Adjusted text size for smaller screens */}
-          <p className="text-lg text-white sm:text-xl md:text-lg lg:text-2xl">
-            Unleash your inner fashionista. Every piece in our collection is a
-            canvas for your unique style.
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8"></div>
+          <div className="flex flex-col items-center gap-2">
+            <Image width={250} height={250} src={`/00.png`} alt="stitchedIT" />
+            
+          </div>
+          <p className="text-lg md:text-2xl text-white">
+            Unleash your inner fashionista. Every piece in our collection is a canvas for your unique style.
           </p>
           <Link
             className="inline-flex cursor-pointer items-center justify-center rounded border border-stitched-pink px-4 py-2 text-base leading-none text-white transition duration-300 ease-in-out hover:border-transparent hover:bg-white hover:text-stitched-pink md:px-6 md:py-3 md:text-lg lg:text-xl"
