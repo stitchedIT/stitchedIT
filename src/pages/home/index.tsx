@@ -7,9 +7,40 @@ import { api } from "~/utils/api";
 import SwipeableComponent from "~/components/SwipeableComponent";
 import { useUser } from "@clerk/nextjs";
 type SwitchProps = {
-    userId: string;
+  userId: string;
+};
+
+export const getServerSideProps: GetServerSideProps<SwitchProps> = async (
+  ctx: GetServerSidePropsContext
+) => {
+  // const { userId } = getAuth(ctx.req);
+  const { userId } = getAuth(ctx.req);
+  if (!userId) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
   }
 
+<<<<<<< HEAD
+  return { props: { ...buildClerkProps(ctx.req), userId } };
+};
+const HomePage: NextPage = (userId: any) => {
+  return (
+    <>
+      <Head>
+        <title>Home Page</title>
+        <meta name="description" content="An app to explore new clothes." />
+        <link rel="icon" href="/00.png" />
+      </Head>
+      <h1>This is the Home page</h1>
+      <SwipeableComponent userId={userId.userId} />
+    </>
+  );
+};
+=======
 
 export const getServerSideProps: GetServerSideProps<SwitchProps> = async (ctx:GetServerSidePropsContext) => {
     
@@ -50,5 +81,6 @@ const HomePage: NextPage = (userId: any) => {
         </>
     )
 }
+>>>>>>> main
 
 export default HomePage;

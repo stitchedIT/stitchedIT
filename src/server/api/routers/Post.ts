@@ -181,6 +181,28 @@ export const postRouter = createTRPCRouter({
         },
       });
     }),
+  
+  getBookmarksByPostId: protectedProcedure
+  .input(z.object({
+    postId: z.number(),
+  }))
+  .query(async ({ input, ctx }) => {
+    const postWithBookmarks = await ctx.prisma.post.findUnique({
+      where: {
+        id: input.postId,
+      },
+      include: {
+        bookmarkedBy: true, // Include the users who bookmarked this post
+      },
+    });
+
+    if (!postWithBookmarks) {
+      throw new Error('Post not found');
+    }
+
+    return postWithBookmarks.bookmarkedBy; // This will return an array of users who bookmarked the post
+  }),
+
   deleteComment: protectedProcedure
     .input(
       z.object({

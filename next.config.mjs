@@ -8,9 +8,12 @@ await import("./src/env.mjs");
 const config = {
   reactStrictMode: false,
   images: {
-    domains: ['imagesitems.blob.core.windows.net'],
+    domains: [
+      "imagesitems.blob.core.windows.net",
+      "xwhmshfqmtdtneasprwx.supabase.co",
+    ],
   },
-  
+
   /**
    * If you have `experimental: { appDir: true }` set, then you must comment the below `i18n` config
    * out.
@@ -24,4 +27,3 @@ const config = {
 };
 
 export default config;
-

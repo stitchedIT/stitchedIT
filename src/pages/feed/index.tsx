@@ -33,7 +33,7 @@ const FeedPage: NextPage<Props> = ({ userId }) => {
         <meta name="description" content="An app to explore new clothes." />
         <link rel="icon" href="/00.png" />
       </Head>
-      <div className="bg-stitched-darkGray p-5 md:px-20">
+      <div className="bg-stitched-black p-5 md:px-20">
       <CreatePost userId={userId} />
       
       <PostList userId={userId} />
