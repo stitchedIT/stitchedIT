@@ -79,9 +79,9 @@ export const postRouter = createTRPCRouter({
         where: {
           postId: input.postId,
         },
-        include: {
-          user: true,
-        },
+        // include: {
+        //   user: true,
+        // },
       });
     }),
   updatePost: protectedProcedure
