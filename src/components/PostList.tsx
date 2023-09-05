@@ -81,14 +81,33 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
     setClickCount(clickCount + 1);
     setShowComments(clickCount % 2 === 0);
   };
+  // {
+  //   createLike.mutate(
+  //     {
+  //       userId: userId,
+  //       postId: id,
+  //     },
+  //     {
+  //       onSuccess: async () => {
+  //         setLikes((await getLikes.refetch()).data.length);
+  //       },
+  //     }
+  //   );
+  // };
   const handleComment = (id: number) => {
-    createComment.mutate({
+    createComment.mutate(
+      {
       userId: userId,
       postId: id,
       content: comment,
+    }, 
+    {
+      onSuccess: async () => {
+      setComments((await commentsQuery.refetch().data))
+            }, 
     });
-    setComment("");
-    setComments([...comments, { id: comments.length + 1, content: comment }]);
+    // setComment("");
+    // setComments([...comments, { id: comments.length + 1, content: comment }]);
   };
 
   const isOwner = userId === post.userId;
