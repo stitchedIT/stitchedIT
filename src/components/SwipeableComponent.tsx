@@ -82,9 +82,9 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
       setLocalItemIndex((prevIndex) => prevIndex + 1);
     }
   };
-
+  let color = "bg-" +items[localItemIndex]?.color + "-500";
   return (
-    <div className="flex h-screen items-center justify-center overflow-x-hidden overflow-y-hidden  border bg-stitched-black text-white ">
+    <div className="flex h-screen items-center justify-center overflow-x-hidden overflow-y-hidden  border bg-stitched-darkGray text-white  ">
       <div className="flex justify-between ">
         <Button
           onClick={() => setLocalItemIndex((prevIndex) => prevIndex - 1)}
@@ -107,7 +107,18 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
             ></path>
           </svg>
         </Button>
+        <div className={color}>
+          <h1> {items[localItemIndex]?.brand}</h1>
+        
+        <h1> {items[localItemIndex]?.color}</h1>
+        
 
+        <h1> {items[localItemIndex]?.type}</h1>
+        </div>
+        
+        
+        {/* //small div circle to display the color of the item */}
+        <div className="w-8 h-8 rounded-full bg-"></div>
         <TinderCard
           className="relative appearance-none text-center"
           ref={cardRef}
@@ -116,6 +127,7 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
           preventSwipe={["up", "down"]}
         >
           {items[localItemIndex] && <ImageStack item={items[localItemIndex]} />}
+          <h1> {items[localItemIndex]?.description}</h1>
         </TinderCard>
 
         <Button
