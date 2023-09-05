@@ -56,7 +56,7 @@ function CreatePostComponent({ userId }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-stitched-sand  p-8 rounded-lg  shadow-md w-full max-w-lg mx-auto mt-12">
+    <form onSubmit={handleSubmit} className="bg-stitched-sand  p-8 rounded-lg  shadow-md w-full max-w-2xl mx-auto mt-2">
       <textarea
         value={formData.description}
         onChange={(e) =>
@@ -85,7 +85,7 @@ function CreatePostComponent({ userId }: Props) {
         />
       </div>
 
-      <button type="submit" className="mt-6 bg-stitched-pink text-stitched-lightPink px-6 py-2 rounded-md hover:bg-stitched-darkGray hover:text-stitched-sand focus:outline-none">
+      <button type="submit" className="mt-6 bg-stitched-pink text-stitched-darkGray px-6 py-2 rounded-md hover:bg-stitched-lightPink focus:outline-none">
         Create Post
       </button>
     </form>

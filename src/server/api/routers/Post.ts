@@ -28,7 +28,7 @@ export const postRouter = createTRPCRouter({
       });
     }),
 
-    deletePost: protectedProcedure
+  deletePost: protectedProcedure
     .input(
       z.object({
         postId: z.number(),
@@ -40,7 +40,7 @@ export const postRouter = createTRPCRouter({
           id: input.postId,
         },
       });
-  
+
       if (existingPost) {
         return await ctx.prisma.post.delete({
           where: {
@@ -51,13 +51,15 @@ export const postRouter = createTRPCRouter({
         throw new Error("Post not found"); // or handle the case when the post does not exist
       }
     }),
-    addComment: protectedProcedure.input(
+  addComment: protectedProcedure
+    .input(
       z.object({
         postId: z.number(),
         content: z.string(),
         userId: z.string(),
       })
-    ).mutation(async ({ input, ctx }) => {
+    )
+    .mutation(async ({ input, ctx }) => {
       return await ctx.prisma.comment.create({
         data: {
           postId: input.postId,
@@ -66,10 +68,13 @@ export const postRouter = createTRPCRouter({
         },
       });
     }),
-    getCommentsByPostId: protectedProcedure .input(
+  getCommentsByPostId: protectedProcedure
+    .input(
       z.object({
         postId: z.number(),
-      })  ).query(async ({ input, ctx }) => {
+      })
+    )
+    .query(async ({ input, ctx }) => {
       return await ctx.prisma.comment.findMany({
         where: {
           postId: input.postId,
@@ -77,7 +82,7 @@ export const postRouter = createTRPCRouter({
         include: {
           user: true,
         },
-      })
+      });
     }),
   updatePost: protectedProcedure
     .input(
@@ -98,7 +103,6 @@ export const postRouter = createTRPCRouter({
         },
       });
     }),
-
 
   bookmarkPost: protectedProcedure
     .input(
@@ -160,10 +164,13 @@ export const postRouter = createTRPCRouter({
   getAllPosts: protectedProcedure.query(({ ctx }) => {
     return ctx.prisma.post.findMany();
   }),
-  getBookmarkedPosts: protectedProcedure.input(
-    z.object({
-      userId: z.string(),
-    })  ).query(({ input, ctx }) => {
+  getBookmarkedPosts: protectedProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+      })
+    )
+    .query(({ input, ctx }) => {
       return ctx.prisma.post.findMany({
         where: {
           bookmarkedBy: {
@@ -174,12 +181,14 @@ export const postRouter = createTRPCRouter({
         },
       });
     }),
-  deleteComment: protectedProcedure 
-  .input(
-    z.object({
-      postId: z.number(),
-      commentId: z.number(),
-    })  ).mutation(async ({ input, ctx }) => {
+  deleteComment: protectedProcedure
+    .input(
+      z.object({
+        postId: z.number(),
+        commentId: z.number(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
       return await ctx.prisma.comment.delete({
         where: {
           id: input.commentId,
@@ -257,4 +266,19 @@ export const postRouter = createTRPCRouter({
 
       return true;
     }),
+    //Get likes by post id
+    getLikesByPostId: protectedProcedure
+    .input(
+      z.object({
+        postId: z.number(),
+
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      return await ctx.prisma.likes.findMany({
+        where: {
+          postId: input.postId,
+        },
+      });
+    })
 });
