@@ -65,7 +65,7 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
           feedback: feedback,
         },
         {
-          // Using the onSuccess callback provided by react-query to reset the isMutating state
+          
           onSuccess: () => {
             setIsMutating(false);
           },

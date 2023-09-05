@@ -5,12 +5,11 @@ import CreatePost from "~/components/CreatePost";
 import PostList from "~/components/PostList";
 import { api } from "~/utils/api";
 import { getAuth, buildClerkProps } from "@clerk/nextjs/server";
-import {Post} from "~/types";
+import { Post } from "~/types";
 
 type Props = {
   userId: string;
 };
-
 
 export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
   const { userId } = getAuth(ctx.req);
@@ -26,7 +25,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
   return { props: { ...buildClerkProps(ctx.req), userId } };
 };
 
-const FeedPage: NextPage<Props> = ({ userId}) => {
+const FeedPage: NextPage<Props> = ({ userId }) => {
   return (
     <>
       <Head>
@@ -34,8 +33,11 @@ const FeedPage: NextPage<Props> = ({ userId}) => {
         <meta name="description" content="An app to explore new clothes." />
         <link rel="icon" href="/00.png" />
       </Head>
+      <div className="bg-stitched-darkGray p-5 md:px-20">
       <CreatePost userId={userId} />
-      <PostList userId={userId}  />
+      
+      <PostList userId={userId} />
+      </div>
     </>
   );
 };
