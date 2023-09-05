@@ -3,7 +3,7 @@ import { type NextPage } from "next";
 import { getAuth, buildClerkProps } from "@clerk/nextjs/server";
 import { GetServerSidePropsContext } from "next";
 import { type GetServerSideProps } from "next";
-import SwipeableComponent from "~/components/SwipeableComponent";
+
 import Footer from "~/components/Footer";  
 import Image from "next/image";
 import Link from "next/link";
@@ -44,7 +44,7 @@ const HomePage: NextPage = (userId: any) => {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8"></div>
           <div className="flex flex-col items-center gap-2">
             <Image width={250} height={250} src={`/00.png`} alt="stitchedIT" />
-            <SwipeableComponent userId={userId.userId}/>
+            
           </div>
           <p className="text-lg md:text-2xl text-white">
             Unleash your inner fashionista. Every piece in our collection is a canvas for your unique style.
