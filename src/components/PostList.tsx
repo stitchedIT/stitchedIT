@@ -3,6 +3,11 @@ import { api } from "~/utils/api";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { get } from "http";
+import { Toaster } from "@/components/ui/toaster"
+import { useToast } from "@/components/ui/use-toast"
+
+
+
 
 type PostProps = {
   post: PostType;
@@ -27,6 +32,7 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
   const [comments, setComments] = useState<any[]>(
     commentsQuery.data ? [...commentsQuery.data] : []
   );
+  const { toast } = useToast()
 
   const handleLike = (id: number) => {
     createLike.mutate(
@@ -48,7 +54,9 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
         postId: id,
       },
       {
-        onSuccess: async () => {},
+        onSuccess: async () => {
+          
+        },
       }
     );
   };
@@ -63,6 +71,10 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
       userId: userId,
       postId: id,
     });
+    toast({
+      title: "Post Saved",
+      description: "You have great taste!",
+    })
   };
 
   const handleViewComments = (id: number) => {
@@ -119,6 +131,7 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
         value={comment}
         onChange={(e) => setComment(e.target.value)}
         placeholder="Write a comment..."
+        className="text-black"
       />
       <Button
         className="bg-stitched-lightPink"
@@ -128,7 +141,7 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
         Comment
       </Button>
       <Button
-        className="bg-stitched-lightPink"
+        className="bg-stitched-lightPink "
         variant="outline"
         onClick={() => handleViewComments(post.id)}
       >
@@ -157,12 +170,16 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
 function PostList({ userId }: PostListProps) {
   const posts = api.post.getAllPosts.useQuery();
   let postsData = posts.data;
+  
+  
 
   return (
     <div>
       {postsData?.map((post) => (
         <Post key={post.id} post={post} userId={userId} />
       ))}
+    <Toaster />
+
     </div>
   );
 }

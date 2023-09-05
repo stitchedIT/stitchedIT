@@ -22,6 +22,8 @@ function CreatePostComponent({ userId }: Props) {
   });
 
   const createPost = api.post.addPost.useMutation();
+  const posts = api.post.getAllPosts.useQuery();
+  
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const postFile = event.target.files && event.target.files[0];
@@ -41,6 +43,7 @@ function CreatePostComponent({ userId }: Props) {
         const imageUrl = `https://xwhmshfqmtdtneasprwx.supabase.co/storage/v1/object/public/pictures/${path}`;
         setFormData((prev) => ({ ...prev, imageUrl }));
     }
+
   }
   
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -53,10 +56,11 @@ function CreatePostComponent({ userId }: Props) {
       ...formData,
       brandTags: tagsArray,
     });
+    await posts.refetch();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-stitched-sand  p-8 rounded-lg  shadow-md w-full max-w-2xl mx-auto mt-2">
+    <form onSubmit={handleSubmit} className="bg-stitched-sand  p-8 rounded-lg shadow-md w-full max-w-2xl mx-auto mt-2">
       <textarea
         value={formData.description}
         onChange={(e) =>
