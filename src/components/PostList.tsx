@@ -2,7 +2,6 @@ import { api } from "~/utils/api";
 import Post from "./Post";
 // import { Toaster } from "@/components/ui/toaster";
 
-
 type PostListProps = {
   userId: string;
 };

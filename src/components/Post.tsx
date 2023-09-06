@@ -7,6 +7,7 @@ import { formatDistanceToNow } from "date-fns";
 import { FaHeart, FaRegCommentDots, FaBookmark } from "react-icons/fa";
 import Image from "next/image";
 
+
 const Post: React.FC<PostProps> = ({ post, userId }) => {
   const [showComments, setShowComments] = useState(false);
   const [likes, setLikes] = useState(post.likesCount);
@@ -102,20 +103,26 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
       className="mx-auto mt-6 flex w-full max-w-3xl flex-col items-center justify-center rounded-lg bg-stitched-black p-8 text-white shadow-md outline-dashed"
       key={post.id}
     >
-    {/* Post Header */}
+      {/* Post Header */}
       <div className="post-header mb-4 flex w-full items-center border-b pb-4">
+
+        {/* Poster's Image */}
         <div className="relative mr-4 h-10 w-10">
           <Image
-            src={post.user?.profilePicture || "/placeholder.png"}
-            alt={post.user?.username || "Anonymous"}
+            src={post.user?.image || "/placeholder.png"}
+            alt={post.user?.userName || "Anonymous"}
             layout="fill"
             objectFit="cover"
             className="rounded-full"
           />
         </div>
+
+        {/* Poster's Name */}
         <h4 className="flex-1 font-bold">
-          {post.user?.username || "Anonymous"}
+          {post.user?.userName || "Anonymous"}
         </h4>
+
+        {/* Post creation date */}
         <time className="text-sm text-gray-500">
           {formatDate(post.createdAt)}
         </time>
@@ -131,9 +138,11 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
           <div className="flex items-center space-x-4">
             <button onClick={() => handleLike(post.id)}>
               <div className="flex items-center space-x-2">
-                {isLiked ? 
-                  <FaHeart color="#F70085" size={24} /> : 
-                  <FaHeart size={24} />}
+                {isLiked ? (
+                  <FaHeart color="#F70085" size={24} />
+                ) : (
+                  <FaHeart size={24} />
+                )}
                 <span>{likes}</span>
               </div>
             </button>
@@ -143,49 +152,51 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
           </div>
 
           <button onClick={() => handleSave(post.id)}>
-            {isBookmarked ? 
-              <FaBookmark color="blue" size={24} /> : 
-              <FaBookmark size={24} />}
+            {isBookmarked ? (
+              <FaBookmark color="blue" size={24} />
+            ) : (
+              <FaBookmark size={24} />
+            )}
           </button>
         </div>
 
-      <input
-        type="text"
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-        placeholder="Write a comment..."
-        className="mb-2 mt-4 w-full rounded border bg-white p-2 text-black shadow-inner"
-      />
+        <input
+          type="text"
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          placeholder="Write a comment..."
+          className="mb-2 mt-4 w-full rounded border bg-white p-2 text-black shadow-inner"
+        />
 
-      <Button
-        className="btn mb-2 w-full bg-stitched-lightPink"
-        variant="outline"
-        onClick={() => handleComment(post.id)}
-      >
-        Comment
-      </Button>
-      <Button
-        className="btn w-full bg-stitched-lightPink"
-        variant="outline"
-        onClick={() => handleViewComments(post.id)}
-      >
-        View Comments
-      </Button>
+        <Button
+          className="btn mb-2 w-full bg-stitched-lightPink"
+          variant="outline"
+          onClick={() => handleComment(post.id)}
+        >
+          Comment
+        </Button>
+        <Button
+          className="btn w-full bg-stitched-lightPink"
+          variant="outline"
+          onClick={() => handleViewComments(post.id)}
+        >
+          View Comments
+        </Button>
 
-      {showComments &&
-        commentsQuery.data?.map((comment) => (
-          <div key={comment.id} className="mt-4">
-            <p>{comment.content}</p>
-            <Button
-              className="btn bg-stitched-lightPink"
-              variant="outline"
-              onClick={() => handleDeleteComment(comment.id)}
-            >
-              Delete
-            </Button>
-          </div>
-        ))}
-    </div>
+        {showComments &&
+          commentsQuery.data?.map((comment) => (
+            <div key={comment.id} className="mt-4">
+              <p>{comment.content}</p>
+              <Button
+                className="btn bg-stitched-lightPink"
+                variant="outline"
+                onClick={() => handleDeleteComment(comment.id)}
+              >
+                Delete
+              </Button>
+            </div>
+          ))}
+      </div>
     </div>
   );
 };
