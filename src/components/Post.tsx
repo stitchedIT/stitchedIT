@@ -77,14 +77,21 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
     );
   };
   const handleDelete = (id: number) => {
-    deletePost.mutate({ postId: id });
+    deletePost.mutate({ postId: id },
+      {
+        onSuccess: async () => {
+          // const updatedPosts = (await .refetch()).data;
+          // setLikes(updatedLikes);
+        },
+      })
   };
 
   const handleDeleteComment = (id: number) => {
     deleteComment.mutate(
       { postId: post.id, commentId: id },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
+          setComments(await commentsQuery.refetch().data);
           toast({
             title: "Comment Deleted",
             description: "Your comment has been removed.",
@@ -112,7 +119,7 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
     );
   };
 
-  const handleViewComments = () => {
+  const handleViewComments = async () => {
     setShowComments(!showComments);
   };
 
