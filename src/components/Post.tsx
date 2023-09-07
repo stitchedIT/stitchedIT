@@ -6,7 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { formatDistanceToNow } from "date-fns";
 import { FaHeart, FaRegCommentDots, FaBookmark } from "react-icons/fa";
 import Image from "next/image";
-
+import { motion, useAnimation } from "framer-motion";
 
 const Post: React.FC<PostProps> = ({ post, userId }) => {
   const [showComments, setShowComments] = useState(false);
@@ -20,6 +20,16 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
   const [comment, setComment] = useState("");
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
+  const [expandedDescription, setExpandedDescription] = useState(false);
+  const likesControls = useAnimation();
+  const commentControls = useAnimation();
+  const bookmarkControls = useAnimation();
+
+  useEffect(() => {
+    likesControls.start({ scale: isLiked ? 1.2 : 1 });
+    bookmarkControls.start({ scale: isBookmarked ? 1.2 : 1 });
+  }, [isLiked, isBookmarked]);
+
 
   const getBookmarks = api.post.getBookmarksByPostId.useQuery({
     postId: post.id,
@@ -61,7 +71,23 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
   };
 
   const handleDeleteComment = (id: number) => {
-    deleteComment.mutate({ postId: post.id, commentId: id });
+    deleteComment.mutate(
+      { postId: post.id, commentId: id },
+      {
+        onSuccess: () => {
+          toast({
+            title: "Comment Deleted",
+            description: "Your comment has been removed.",
+          });
+        },
+        onError: (error: any) => {
+          toast({
+            title: "Error",
+            description: error.message || "Unable to delete the comment.",
+          });
+        },
+      }
+    );
   };
 
   const handleSave = (id: number) => {
@@ -99,105 +125,143 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
   const isOwner = userId === post.userId;
 
   return (
-    <div
-      className="mx-auto mt-6 flex w-full max-w-3xl flex-col items-center justify-center rounded-lg bg-stitched-black p-8 text-white shadow-md outline-dashed"
+    <motion.div
+      className="mx-auto mt-6 flex w-full max-w-3xl flex-col items-center justify-center rounded-lg bg-stitched-black p-8 text-white shadow-lg"
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
       key={post.id}
     >
       {/* Post Header */}
-      <div className="post-header mb-4 flex w-full items-center border-b pb-4">
-
+      <div className="post-header mb-4 flex w-full items-center pb-4">
         {/* Poster's Image */}
-        <div className="relative mr-4 h-10 w-10">
+        <motion.div className="relative mr-4 h-12 w-12 transform overflow-hidden rounded-full transition-all hover:scale-105">
           <Image
             src={post.user?.image || "/placeholder.png"}
             alt={post.user?.userName || "Anonymous"}
             layout="fill"
             objectFit="cover"
-            className="rounded-full"
           />
-        </div>
+        </motion.div>
 
         {/* Poster's Name */}
-        <h4 className="flex-1 font-bold">
+        <h4 className="flex-1 text-lg font-semibold">
           {post.user?.userName || "Anonymous"}
         </h4>
 
         {/* Post creation date */}
-        <time className="text-sm text-gray-500">
+        <time className="text-sm text-gray-600">
           {formatDate(post.createdAt)}
         </time>
       </div>
 
-      {/* Post content (the image) */}
-      <Image src={post.imageUrl} width={600} height={400} alt="post" />
+      {/* Post content */}
+      <Image
+        src={post.imageUrl}
+        width={600}
+        height={400}
+        alt="post"
+        className="rounded"
+      />
 
-      {/* Post Footer */}
-      <div className="mt-4 w-full">
-        <p className="mb-4">{post.description}</p>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <button onClick={() => handleLike(post.id)}>
-              <div className="flex items-center space-x-2">
-                {isLiked ? (
-                  <FaHeart color="#F70085" size={24} />
-                ) : (
-                  <FaHeart size={24} />
-                )}
-                <span>{likes}</span>
-              </div>
-            </button>
-            <button onClick={handleViewComments}>
-              <FaRegCommentDots size={24} />
-            </button>
-          </div>
+      {/* Post Description */}
+      <p className="my-4 leading-relaxed text-gray-300">
+        {expandedDescription || post.description.length <= 100
+          ? post.description
+          : `${post.description.substring(0, 100)}...`}
+        {post.description.length > 100 && (
+          <span
+            className="ml-2 cursor-pointer text-white"
+            onClick={() => setExpandedDescription(!expandedDescription)}
+          >
+            {expandedDescription ? "Show less" : "Read more"}
+          </span>
+        )}
+      </p>
 
-          <button onClick={() => handleSave(post.id)}>
-            {isBookmarked ? (
-              <FaBookmark color="blue" size={24} />
+      {/* Actions */}
+      <div className="mb-4 flex items-center justify-between space-x-4">
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => handleLike(post.id)}
+        >
+          <div className="flex items-center space-x-2">
+            {isLiked ? (
+              <FaHeart color="#F70085" size={24} />
             ) : (
-              <FaBookmark size={24} />
+              <FaHeart size={24} />
             )}
-          </button>
-        </div>
+            <span className="text-white">{likes}</span>
+          </div>
+        </motion.button>
 
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={handleViewComments}
+        >
+          <FaRegCommentDots size={24} className="text-white" />
+        </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => handleSave(post.id)}
+        >
+          {isBookmarked ? (
+            <FaBookmark color="blue" size={24} />
+          ) : (
+            <FaBookmark size={24} className="text-white" />
+          )}
+        </motion.button>
+      </div>
+
+      {/* Comments */}
+      <div className="w-full">
         <input
           type="text"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
+          onKeyPress={(e) => e.key === "Enter" && handleComment(post.id)}
           placeholder="Write a comment..."
-          className="mb-2 mt-4 w-full rounded border bg-white p-2 text-black shadow-inner"
+          className="mb-2 w-full rounded bg-transparent p-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-stitched-lightPink"
         />
 
-        <Button
-          className="btn mb-2 w-full bg-stitched-lightPink"
-          variant="outline"
-          onClick={() => handleComment(post.id)}
-        >
-          Comment
-        </Button>
-        <Button
-          className="btn w-full bg-stitched-lightPink"
-          variant="outline"
-          onClick={() => handleViewComments(post.id)}
-        >
-          View Comments
-        </Button>
+        <div className="flex gap-5">
+          <Button
+            Button
+            className="btn w-full bg-stitched-lightPink hover:bg-stitched-pink focus:outline-none focus:ring-2 focus:ring-blue-400"
+            onClick={() => handleComment(post.id)}
+          >
+            Comment
+          </Button>
+
+          <Button
+            className="btn w-full bg-stitched-lightPink hover:bg-stitched-pink focus:outline-none focus:ring-2 focus:ring-gray-500"
+            onClick={handleViewComments}
+          >
+            {showComments ? "Hide Comments" : "View Comments"}
+          </Button>
+        </div>
 
         {showComments &&
           commentsQuery.data?.map((comment) => (
             <div key={comment.id} className="mt-4">
-              <p>{comment.content}</p>
-              <Button
-                className="btn bg-stitched-lightPink"
-                variant="outline"
-                onClick={() => handleDeleteComment(comment.id)}
-              >
-                Delete
-              </Button>
+              <p className="text-gray-300">{comment.content}</p>
+              {(comment.userId === userId || isOwner) && (
+                <Button
+                  className="btn bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
+                  variant="outline"
+                  onClick={() => handleDeleteComment(comment.id)}
+                >
+                  Delete
+                </Button>
+              )}
             </div>
           ))}
       </div>
-    </div>
+    </motion.div>
   );
 };
 
