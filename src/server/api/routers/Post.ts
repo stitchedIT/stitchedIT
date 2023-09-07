@@ -178,22 +178,34 @@ export const postRouter = createTRPCRouter({
   }),
 
   getBookmarkedPosts: protectedProcedure
-    .input(
-      z.object({
-        userId: z.string(),
-      })
-    )
-    .query(({ input, ctx }) => {
-      return ctx.prisma.post.findMany({
-        where: {
-          bookmarkedBy: {
-            some: {
-              id: input.userId,
-            },
+  .input(
+    z.object({
+      userId: z.string(),
+    })
+  )
+  .query(({ input, ctx }) => {
+    return ctx.prisma.post.findMany({
+      where: {
+        bookmarkedBy: {
+          some: {
+            id: input.userId,
           },
         },
-      });
-    }),
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            userName: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+    });
+  }),
+
 
   getBookmarksByPostId: protectedProcedure
     .input(
