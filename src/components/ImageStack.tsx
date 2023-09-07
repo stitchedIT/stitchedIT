@@ -25,8 +25,11 @@ const ImageStack: React.FC<ImageStackProps> = ({ item }) => {
   return (
     <div>
       <Image
-        width={600}
-        height={300}
+        width={500}
+        height={250}
+        style={{ maxWidth: 900, maxHeight: 700 }}
+        placeholder="blur"
+        blurDataURL={"/00.png"}
         draggable={false}
         src={item.imageUrl}
         alt={item.description}
