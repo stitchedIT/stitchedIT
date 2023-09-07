@@ -7,33 +7,47 @@ import { formatDistanceToNow } from "date-fns";
 import { FaHeart, FaRegCommentDots, FaBookmark } from "react-icons/fa";
 import Image from "next/image";
 import { motion, useAnimation } from "framer-motion";
+import { Post } from "@prisma/client";
+import { Badge } from "@/components/ui/badge";
+
+type PostProps = {
+  post: Post;
+  userId: number;
+};
 
 const Post: React.FC<PostProps> = ({ post, userId }) => {
+  // State Hooks
   const [showComments, setShowComments] = useState(false);
   const [likes, setLikes] = useState(post.likesCount);
+  const [comment, setComment] = useState("");
+  const [isLiked, setIsLiked] = useState<boolean>(false);
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
+  const [expandedDescription, setExpandedDescription] = useState(false);
+
+  // Custom Hooks and API Hooks
   const createLike = api.post.toggleLike.useMutation();
   const getLikes = api.post.getLikesByPostId.useQuery({ postId: post.id });
   const createComment = api.post.addComment.useMutation();
   const deletePost = api.post.deletePost.useMutation();
   const deleteComment = api.post.deleteComment.useMutation();
   const savePost = api.post.bookmarkPost.useMutation();
-  const [comment, setComment] = useState("");
-  const [isLiked, setIsLiked] = useState<boolean>(false);
-  const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
-  const [expandedDescription, setExpandedDescription] = useState(false);
+  const getBookmarks = api.post.getBookmarksByPostId.useQuery({
+    postId: post.id,
+  });
+  const commentsQuery = api.post.getCommentsByPostId.useQuery({
+    postId: post.id,
+  });
+
+  // Animation hooks
   const likesControls = useAnimation();
   const commentControls = useAnimation();
   const bookmarkControls = useAnimation();
 
+  // Effects
   useEffect(() => {
     likesControls.start({ scale: isLiked ? 1.2 : 1 });
     bookmarkControls.start({ scale: isBookmarked ? 1.2 : 1 });
   }, [isLiked, isBookmarked]);
-
-
-  const getBookmarks = api.post.getBookmarksByPostId.useQuery({
-    postId: post.id,
-  });
 
   useEffect(() => {
     const userLike = getLikes.data?.find((like) => like.userId === userId);
@@ -44,10 +58,6 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
     );
     setIsBookmarked(!!userBookmark);
   }, [getLikes.data, userId, getBookmarks.data]);
-
-  const commentsQuery = api.post.getCommentsByPostId.useQuery({
-    postId: post.id,
-  });
 
   const [comments, setComments] = useState<any[]>(
     commentsQuery.data ? [...commentsQuery.data] : []
@@ -133,27 +143,52 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
       key={post.id}
     >
       {/* Post Header */}
-      <div className="post-header mb-4 flex w-full items-center pb-4">
+      <div className="post-header borde mb-4 flex w-full items-center justify-between">
         {/* Poster's Image */}
-        <motion.div className="relative mr-4 h-12 w-12 transform overflow-hidden rounded-full transition-all hover:scale-105">
-          <Image
-            src={post.user?.image || "/placeholder.png"}
-            alt={post.user?.userName || "Anonymous"}
-            layout="fill"
-            objectFit="cover"
-          />
-        </motion.div>
+        <div className="flex">
+          <motion.div className="relative mr-4 h-12 w-12 transform overflow-hidden rounded-full transition-all hover:scale-105">
+            <Image
+              src={post.user?.image || "/placeholder.png"}
+              alt={post.user?.userName || "Anonymous"}
+              layout="fill"
+              objectFit="cover"
+            />
+          </motion.div>
 
-        {/* Poster's Name */}
-        <h4 className="flex-1 text-lg font-semibold">
-          {post.user?.userName || "Anonymous"}
-        </h4>
+          {/* Poster's Name & time created */}
+          <div className="flex flex-col">
+            <h4 className="text-lg font-semibold">
+              {post.user?.userName || "Anonymous"}
+            </h4>
+            <time className="text-sm text-gray-600">
+              {formatDate(post.createdAt)}
+            </time>
+          </div>
+        </div>
 
-        {/* Post creation date */}
-        <time className="text-sm text-gray-600">
-          {formatDate(post.createdAt)}
-        </time>
+        {isOwner && (
+          <button
+            onClick={() => handleDelete(post.id)}
+            className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
+          >
+            Delete
+          </button>
+        )}
       </div>
+
+      {/* Post brands */}
+      <div className="mt-2 flex flex-wrap">
+        {post.brandTags?.map((tag, index) => (
+          <Badge
+            key={index}
+            className="mb-2 mr-2 bg-stitched-darkGray px-4 py-1.5"
+          >
+            {tag}
+          </Badge>
+        ))}
+      </div>
+
+      <div className="p-5" />
 
       {/* Post content */}
       <Image
@@ -180,29 +215,31 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
       </p>
 
       {/* Actions */}
-      <div className="mb-4 flex items-center justify-between space-x-4">
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => handleLike(post.id)}
-        >
-          <div className="flex items-center space-x-2">
-            {isLiked ? (
-              <FaHeart color="#F70085" size={24} />
-            ) : (
-              <FaHeart size={24} />
-            )}
-            <span className="text-white">{likes}</span>
-          </div>
-        </motion.button>
+      <div className="mb-4 flex w-full items-center justify-between">
+        <div className="flex space-x-4">
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => handleLike(post.id)}
+          >
+            <div className="flex items-center space-x-2">
+              {isLiked ? (
+                <FaHeart color="#F70085" size={24} />
+              ) : (
+                <FaHeart size={24} />
+              )}
+              <span className="text-white">{likes}</span>
+            </div>
+          </motion.button>
 
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={handleViewComments}
-        >
-          <FaRegCommentDots size={24} className="text-white" />
-        </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={handleViewComments}
+          >
+            <FaRegCommentDots size={24} className="text-white" />
+          </motion.button>
+        </div>
 
         <motion.button
           whileHover={{ scale: 1.1 }}
