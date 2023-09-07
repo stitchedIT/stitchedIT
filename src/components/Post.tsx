@@ -31,6 +31,7 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
   const deletePost = api.post.deletePost.useMutation();
   const deleteComment = api.post.deleteComment.useMutation();
   const savePost = api.post.bookmarkPost.useMutation();
+  const posted = api.post.getAllPosts.useQuery();
   const getBookmarks = api.post.getBookmarksByPostId.useQuery({
     postId: post.id,
   });
@@ -80,8 +81,8 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
     deletePost.mutate({ postId: id },
       {
         onSuccess: async () => {
-          // const updatedPosts = (await .refetch()).data;
-          // setLikes(updatedLikes);
+          await posted.refetch().data;
+
         },
       })
   };
