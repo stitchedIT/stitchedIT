@@ -81,6 +81,7 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
     deletePost.mutate({ postId: id },
       {
         onSuccess: async () => {
+          console.log("yo");
           await posted.refetch().data;
 
         },
