@@ -2,6 +2,18 @@ import { api } from "~/utils/api";
 import { useEffect } from "react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { formatDistanceToNow } from "date-fns";
 import { FaHeart, FaRegCommentDots, FaBookmark } from "react-icons/fa";
@@ -176,12 +188,28 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
         </div>
 
         {isOwner && (
-          <button
-            onClick={() => handleDelete(post.id)}
-            className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
-          >
-            Delete
-          </button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600">
+                Delete
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="bg-stitched-black text-white">
+              <AlertDialogHeader className="bg-stitched-black">
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  your post.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="bg-black">
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => handleDelete(post.id)}>
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         )}
       </div>
 
@@ -265,24 +293,23 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
 
       {/* Comments */}
       <div className="w-full">
-        <input
-          type="text"
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && handleComment(post.id)}
-          placeholder="Write a comment..."
-          className="mb-2 w-full rounded bg-transparent p-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-stitched-lightPink"
-        />
-
-        <div className="flex gap-5">
+        <div className="relative mb-2 flex w-full">
+          <Textarea
+            placeholder="Write a comment..."
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            onKeyPress={(e) => e.key === "Enter" && handleComment(post.id)}
+            className="mb-2 w-full flex-grow bg-transparent p-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-stitched-lightPink"
+          />
           <Button
-            Button
-            className="btn w-full bg-stitched-lightPink hover:bg-stitched-pink focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="btn absolute bottom-2 right-2 mb-3 bg-stitched-lightPink hover:bg-stitched-pink focus:outline-none focus:ring-2 focus:ring-blue-400"
             onClick={() => handleComment(post.id)}
           >
             Comment
           </Button>
+        </div>
 
+        <div className="mb-2 flex gap-5">
           <Button
             className="btn w-full bg-stitched-lightPink hover:bg-stitched-pink focus:outline-none focus:ring-2 focus:ring-gray-500"
             onClick={handleViewComments}
