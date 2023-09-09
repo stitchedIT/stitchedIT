@@ -14,13 +14,23 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
+import { Toggle } from "@/components/ui/toggle";
 import { formatDistanceToNow } from "date-fns";
-import { FaHeart, FaRegCommentDots, FaBookmark } from "react-icons/fa";
+import { FaHeart, FaRegCommentDots, FaBookmark, FaTrash } from "react-icons/fa";
 import Image from "next/image";
 import { motion, useAnimation } from "framer-motion";
 import { Post } from "@prisma/client";
 import { Badge } from "@/components/ui/badge";
+import { DialogOverlay } from "@radix-ui/react-dialog";
 
 type PostProps = {
   post: Post;
@@ -269,13 +279,145 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
             </div>
           </motion.button>
 
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={handleViewComments}
-          >
-            <FaRegCommentDots size={24} className="text-white" />
-          </motion.button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={handleViewComments}
+              >
+                <FaRegCommentDots size={24} className="text-white" />
+              </motion.button>
+            </DialogTrigger>
+
+            <DialogOverlay>
+              <DialogContent>
+                <div className="flex gap-5">
+                  {/* Left column for the post details */}
+                  <div className="flex w-1/2 items-center justify-center">
+                    <Image
+                      src={post.imageUrl}
+                      layout="responsive"
+                      width={100}
+                      height={100}
+                      alt="post"
+                      className="mb-4 h-full w-full rounded object-cover"
+                    />
+                    {/* ... (other post details here) */}
+                  </div>
+
+                  {/* Right column for the comments and comment form */}
+                  <div className="w-1/2">
+                    {/* Post profile pic + username + timestamp */}
+                    <div className="mb-4 flex items-center">
+                      <motion.div className="relative mr-4 h-12 w-12 transform overflow-hidden rounded-full transition-all hover:scale-105">
+                        <Image
+                          src={post.user?.image || "/placeholder.png"}
+                          alt={post.user?.userName || "Anonymous"}
+                          layout="fill"
+                          objectFit="cover"
+                        />
+                      </motion.div>
+
+                      {/* Poster's Name & time created */}
+                      <div className="flex flex-col">
+                        <h4 className="mb-1 text-lg font-semibold">
+                          {post.user?.userName || "Anonymous"}
+                        </h4>
+                        <time className="text-sm text-gray-600">
+                          {formatDate(post.createdAt)}
+                        </time>
+                      </div>
+                    </div>
+
+                    {/* Post description */}
+                    <p className="my-4 max-h-[50px] overflow-y-auto leading-relaxed text-gray-300">
+                      {post.description}
+                    </p>
+
+                    {/* Brand tags */}
+                    <div className="mb-4 flex flex-wrap">
+                      {post.brandTags?.map((tag, index) => (
+                        <Badge
+                          key={index}
+                          className="mb-2 mr-2 rounded-full bg-stitched-darkGray px-4 py-1.5"
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+
+                    {/* Comment Form */}
+                    <div className="relative mb-2 flex w-full items-center">
+                      <input
+                        type="text"
+                        placeholder="Write a comment..."
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        onKeyPress={(e) =>
+                          e.key === "Enter" && handleComment(post.id)
+                        }
+                        className="w-full flex-grow bg-transparent p-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-stitched-lightPink rounded-lg"
+                      />
+
+                      <Button
+                        className="py-5 btn ml-2 bg-stitched-lightPink hover:bg-stitched-pink focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        onClick={() => handleComment(post.id)}
+                      >
+                        Comment
+                      </Button>
+                    </div>
+
+                    {/* Comments List */}
+                    <div className="max-h-[50vh] overflow-y-auto">
+                      {commentsQuery.data?.map((comment) => (
+                        <div
+                          key={comment.id}
+                          className="mt-4 rounded-lg bg-stitched-black p-3 shadow-lg"
+                        >
+                          <div className="flex items-start space-x-2">
+                            <div className="relative h-10 w-10 overflow-hidden rounded-full">
+                              <Image
+                                src={comment.user.image || "/placeholder.png"}
+                                alt={comment.user.userName || "Anonymous"}
+                                layout="fill"
+                                objectFit="cover"
+                              />
+                            </div>
+                            <div className="flex flex-grow flex-col">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                  <h4 className="font-semibold text-white">
+                                    {comment.user.userName || "Anonymous"}
+                                  </h4>
+                                  <time className="text-xs text-gray-400">
+                                    {formatDate(comment.createdAt)}
+                                  </time>
+                                </div>
+                                {(comment.user.id === userId || isOwner) && (
+                                  <button
+                                    className="text-red-500 hover:text-red-600 focus:outline-none"
+                                    onClick={() =>
+                                      handleDeleteComment(comment.id)
+                                    }
+                                  >
+                                    <FaTrash size={16} />
+                                  </button>
+                                )}
+                              </div>
+                              <p className="mt-2 text-gray-300">
+                                {comment.content}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </DialogContent>
+            </DialogOverlay>
+          </Dialog>
         </div>
 
         <motion.button
@@ -308,31 +450,6 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
             Comment
           </Button>
         </div>
-
-        <div className="mb-2 flex gap-5">
-          <Button
-            className="btn w-full bg-stitched-lightPink hover:bg-stitched-pink focus:outline-none focus:ring-2 focus:ring-gray-500"
-            onClick={handleViewComments}
-          >
-            {showComments ? "Hide Comments" : "View Comments"}
-          </Button>
-        </div>
-
-        {showComments &&
-          commentsQuery.data?.map((comment) => (
-            <div key={comment.id} className="mt-4">
-              <p className="text-gray-300">{comment.content}</p>
-              {(comment.userId === userId || isOwner) && (
-                <Button
-                  className="btn bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
-                  variant="outline"
-                  onClick={() => handleDeleteComment(comment.id)}
-                >
-                  Delete
-                </Button>
-              )}
-            </div>
-          ))}
       </div>
     </motion.div>
   );
