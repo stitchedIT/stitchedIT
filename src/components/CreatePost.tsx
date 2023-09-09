@@ -55,8 +55,12 @@ function CreatePostComponent({ userId }: Props) {
     createPost.mutate({
       ...formData,
       brandTags: tagsArray,
+    },
+    {
+      onSuccess: async () => {
+        await posts.refetch().data;
+      },
     });
-    await posts.refetch();
   };
 
   return (
