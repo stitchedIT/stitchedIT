@@ -162,8 +162,21 @@ export const postRouter = createTRPCRouter({
 
   // Get all posts
   getAllPosts: protectedProcedure.query(({ ctx }) => {
-    return ctx.prisma.post.findMany();
+    return ctx.prisma.post.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            userName: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+    });
   }),
+
   getBookmarkedPosts: protectedProcedure
     .input(
       z.object({
@@ -181,6 +194,30 @@ export const postRouter = createTRPCRouter({
         },
       });
     }),
+
+  getBookmarksByPostId: protectedProcedure
+    .input(
+      z.object({
+        postId: z.number(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const postWithBookmarks = await ctx.prisma.post.findUnique({
+        where: {
+          id: input.postId,
+        },
+        include: {
+          bookmarkedBy: true, // Include the users who bookmarked this post
+        },
+      });
+
+      if (!postWithBookmarks) {
+        throw new Error("Post not found");
+      }
+
+      return postWithBookmarks.bookmarkedBy; // This will return an array of users who bookmarked the post
+    }),
+
   deleteComment: protectedProcedure
     .input(
       z.object({
@@ -266,12 +303,11 @@ export const postRouter = createTRPCRouter({
 
       return true;
     }),
-    //Get likes by post id
-    getLikesByPostId: protectedProcedure
+  //Get likes by post id
+  getLikesByPostId: protectedProcedure
     .input(
       z.object({
         postId: z.number(),
-
       })
     )
     .query(async ({ input, ctx }) => {
@@ -280,5 +316,5 @@ export const postRouter = createTRPCRouter({
           postId: input.postId,
         },
       });
-    })
+    }),
 });

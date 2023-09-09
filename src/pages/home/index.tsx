@@ -5,11 +5,11 @@ import { getAuth, buildClerkProps } from "@clerk/nextjs/server";
 import { GetServerSidePropsContext } from "next";
 import { api } from "~/utils/api";
 import SwipeableComponent from "~/components/SwipeableComponent";
-import { useUser } from "@clerk/nextjs";
-type SwitchProps = {
-    userId: string;
-  }
+// import { useUser } from "@clerk/nextjs";
 
+type SwitchProps = {
+  userId: string;
+};
 
 export const getServerSideProps: GetServerSideProps<SwitchProps> = async (ctx:GetServerSidePropsContext) => {
     
@@ -27,16 +27,16 @@ export const getServerSideProps: GetServerSideProps<SwitchProps> = async (ctx:Ge
     return { props: { ...buildClerkProps(ctx.req), userId } };
   };
 const HomePage: NextPage = (userId: any) => {
-    const { user } = useUser();
-    console.log(user)
+    // const { user } = useUser();
+    // console.log(user)
 
     // async function  getUser(){
-    //     let dog = await api.user.getUserById.useQuery({
+    //     const dog = await api.user.getUserById.useQuery({
     //         id: userId.userId,
     //     })
     //     console.log(dog, "dog")
     // }
-    // getUser()
+    // void getUser()
    
     return (
         <>
