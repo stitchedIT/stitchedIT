@@ -21,14 +21,14 @@ export const getServerSideProps: GetServerSideProps<SwitchProps> = async (
 ) => {
   // const { userId } = getAuth(ctx.req);
   const { userId } = getAuth(ctx.req);
-  if (!userId) {
-    return {
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
-    };
-  }
+  // if (!userId) {
+  //   return {
+  //     redirect: {
+  //       destination: "/login",
+  //       permanent: false,
+  //     },
+  //   };
+  // }
 
   return { props: { ...buildClerkProps(ctx.req), userId } };
 };

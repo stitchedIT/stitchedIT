@@ -65,7 +65,6 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
           feedback: feedback,
         },
         {
-          
           onSuccess: () => {
             setIsMutating(false);
           },
@@ -82,7 +81,13 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
       setLocalItemIndex((prevIndex) => prevIndex + 1);
     }
   };
-  let color = "bg-" +items[localItemIndex]?.color + "-500";
+  let color = "bg-" + items[localItemIndex]?.color;
+  if (
+    items[localItemIndex]?.color !== "white" &&
+    items[localItemIndex]?.color !== "black"
+  ) {
+    color += "-500";
+  }
   return (
     <div className="flex h-screen items-center justify-center overflow-x-hidden overflow-y-hidden  border bg-stitched-darkGray text-white  ">
       <div className="flex justify-between ">
@@ -109,16 +114,14 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
         </Button>
         <div className={color}>
           <h1> {items[localItemIndex]?.brand}</h1>
-        
-        <h1> {items[localItemIndex]?.color}</h1>
-        
 
-        <h1> {items[localItemIndex]?.type}</h1>
+          <h1> {items[localItemIndex]?.color}</h1>
+
+          <h1> {items[localItemIndex]?.type}</h1>
         </div>
-        
-        
+
         {/* //small div circle to display the color of the item */}
-        <div className="w-8 h-8 rounded-full bg-"></div>
+        <div className="bg- h-8 w-8 rounded-full"></div>
         <TinderCard
           className="relative appearance-none text-center"
           ref={cardRef}
