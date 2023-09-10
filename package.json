@@ -47,6 +47,7 @@
     "react-icons": "^4.10.1",
     "react-modal": "^3.16.1",
     "react-query": "^3.39.3",
+    "react-select": "^5.7.4",
     "react-tinder-card": "^1.6.2",
     "superjson": "1.12.2",
     "tailwind-merge": "^1.14.0",
