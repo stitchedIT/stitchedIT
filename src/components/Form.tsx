@@ -50,7 +50,9 @@ function RecFormComponent({ userId }: Props) {
       </div>
       <div className="mt-4">
         <p>What is your favorite brand?</p>
-        <select>
+        <select value={formData.favBrand} onChange={(e) =>
+          setFormData((prev) => ({ ...prev,favBrand: e.target.value }))
+        }>
             <option value="Nike">Nike</option>
             <option value="Adidas">Adidas</option>
             <option selected value="Supreme">Supreme</option>
