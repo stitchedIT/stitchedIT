@@ -140,7 +140,7 @@ function Navbar() {
           </>
         ) : (
           <>
-            <SignInButton>
+            <SignInButton afterSignInUrl = "/home">
               <span
                 className={`${staticStyles} ${buttonVariants({
                   variant: "outline",
@@ -149,7 +149,7 @@ function Navbar() {
                 Login
               </span>
             </SignInButton>
-            <SignUpButton>
+            <SignUpButton afterSignUpUrl= "/form">
               <span
                 className={`${staticStyles} ${buttonVariants({
                   variant: "outline",

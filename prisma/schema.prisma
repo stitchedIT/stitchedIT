@@ -67,6 +67,7 @@ model User {
   bookmarkedPosts Post[] @relation("BookmarkedPosts")
   wishlist      ClothingItem[] @relation("UserWishlist")
   likes         Likes[]
+  recDatas      RecData[]
 }
 
 model Post {
@@ -126,6 +127,13 @@ model Likes {
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
+model RecData {
+  id     Int    @id @default(autoincrement())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  favBrand String
+  favColor String
+}
 
 model VerificationToken {
   identifier String

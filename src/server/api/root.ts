@@ -1,6 +1,7 @@
 import { exampleRouter } from "~/server/api/routers/example";
 import { createTRPCRouter } from "~/server/api/trpc";
 import { postRouter } from "./routers/post";
+import { recDataRouter } from "./routers/recFormData";
 import {userRouter} from "./routers/user"
 import {commentsRouter} from "./routers/comments"
 import {recommendationRouter} from "./routers/recommendation"
@@ -16,7 +17,8 @@ export const appRouter = createTRPCRouter({
   user: userRouter,
   comments:commentsRouter,
   recommendation:recommendationRouter,
-  clothingItem:clothingItemRouter
+  clothingItem:clothingItemRouter,
+  recdata: recDataRouter
   
 });
 
