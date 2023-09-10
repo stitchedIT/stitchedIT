@@ -168,7 +168,8 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
   }
 
   const isOwner = userId === post.userId;
-
+console.log("username",post.user?.userName)
+console.log("img",post.user?.image)
   return (
     <motion.div
       className="mx-auto mt-6 flex w-full max-w-3xl flex-col items-center justify-center rounded-lg bg-stitched-black p-8 text-white shadow-lg"

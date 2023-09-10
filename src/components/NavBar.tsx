@@ -136,7 +136,7 @@ function Navbar() {
             >
               Bookmarks
             </Link>
-            <UserButton />
+            <UserButton afterSignOutUrl="/" />
           </>
         ) : (
           <>
