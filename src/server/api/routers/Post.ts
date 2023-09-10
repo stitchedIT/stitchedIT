@@ -68,6 +68,7 @@ export const postRouter = createTRPCRouter({
         },
       });
     }),
+
   getCommentsByPostId: protectedProcedure
     .input(
       z.object({
@@ -79,11 +80,21 @@ export const postRouter = createTRPCRouter({
         where: {
           postId: input.postId,
         },
-        // include: {
-        //   user: true,
-        // },
+        select: {
+          id: true, // The ID of the comment
+          content: true, // The content of the comment
+          createdAt: true, // The time the comment was created
+          user: {
+            select: {
+              id: true, // The ID of the user
+              userName: true, // The username of the user
+              image: true, // The profile image of the user
+            },
+          },
+        },
       });
     }),
+
   updatePost: protectedProcedure
     .input(
       z.object({
