@@ -10,8 +10,8 @@ import {
     .input(
       z.object({
         userId: z.string(),
-        favColor: z.string(),
-        favBrand: z.string(),
+        favColor: z.array(z.string()),
+        favBrand: z.array(z.string()),
       })
     )
     .mutation(async ({ input, ctx }) => {

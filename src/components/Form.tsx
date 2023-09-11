@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { api } from "~/utils/api";
 import {supabase} from "supabaseClient.js";
+import Select from "react-select/dist/declarations/src/Select";
 
 type FormData = {
   userId: string;
@@ -28,7 +29,7 @@ function RecFormComponent({ userId }: Props) {
     formData.userId = userId || "";
     console.log("formData",formData)
 
-    // const tagsArray = formData.brandTags.split(",").map((tag) => tag.trim());
+    // const tagsArray = formData.favColor.split(",").map((tag) => tag.trim());
 
     makeRecData.mutate({
       ...formData,
