@@ -3,7 +3,8 @@ import dynamic from "next/dynamic";
 import ImageStack from "./ImageStack";
 import { Button } from "@/components/ui/button";
 import { api } from "~/utils/api";
-
+import { supabase } from "supabaseClient.js";
+//xwhmshfqmtdtneasprwx
 type SwipeProps = {
   userId: string;
 };
@@ -44,7 +45,7 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
     }
   }, [recommendedItems]);
 
-  const onSwipe = (direction: string) => {
+  const onSwipe = async (direction: string) => {
     if (isMutating) return; // If a mutation is in progress, do not proceed
     setIsMutating(true); // Set the mutating state to true
 
@@ -65,8 +66,25 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
           feedback: feedback,
         },
         {
-          onSuccess: () => {
-            setIsMutating(false);
+          onSuccess: async () => {
+            // Fetch the updated user feedback after recording the new feedback
+            try {
+              const { data, error } = await supabase.functions.invoke('user-vector', {
+                method: 'POST',
+                
+                body: { userId },
+              });
+  
+              if (error) {
+                throw error;
+              }
+  
+              console.log('Updated user feedback data:', data);
+            } catch (error) {
+              console.error('Failed to get updated user feedback:', error);
+            } finally {
+              setIsMutating(false); 
+            }
           },
         }
       );
@@ -81,6 +99,8 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
       setLocalItemIndex((prevIndex) => prevIndex + 1);
     }
   };
+
+
   let color = "bg-" + items[localItemIndex]?.color;
   if (
     items[localItemIndex]?.color !== "white" &&
