@@ -1,3 +1,4 @@
+import { validateConfig } from "next/dist/server/config-shared";
 import React, { useState } from "react";
 import Select from "react-select";
 import { api } from "~/utils/api";
@@ -12,14 +13,39 @@ const colorOptions = [
   { value: "Blue", label: "Blue" },
   { value: "Red", label: "Red" },
   { value: "Pink", label: "Pink" },
-  { value: "Black", label: "Black" }
+  { value: "Black", label: "Black"},
+  { value: "White", label: "White" },
+  { value: "Green", label: "Green" },
+  { value: "Yellow", label: "Yellow" },
+  { value: "Orange", label: "Orange" },
+  { value: "Purple", label: "Purple" },
+  { value: "Brown", label: "Brown" },
+  { value: "Grey", label: "Grey" },
 ];
 
 const brandOptions = [
   { value: "Supreme", label: "Supreme" },
   { value: "Nike", label: "Nike" },
   { value: "Adidas", label: "Adidas" },
-  { value: "New Balance", label: "New Balance" }
+  { value: "New Balance", label: "New Balance" },
+  { value: "Essentials", label: "Essentials" },
+  { value: "Gucci", label: "Gucci" },
+  { value: "Saint Laurent", label: "Saint Laurent" },
+  { value: "Jordans", label: "Jordans" },
+  { value: "Bape", label: "Bape" },
+  { value: "Billionaire Boys Club", label: "Billionaire Boys Club" },
+  { value: "Carhartt", label: "Carhartt" },
+  { value: "Kith", label: "Kith" },
+  { value: "Neighborhood", label: "Neighborhood" },
+  { value: "Off White", label: "Off White" },
+  { value: "Ralph Lauren", label: "Ralph Lauren" },
+  { value: "Stone Island", label: "Stone Island" },
+  { value: "Stussy", label: "Stussy" },
+  { value: "Yeezy", label: "Yeezy" },
+  { value: "Vlone", label: "Vlone" },
+  { value: "Y 3", label: "Y 3" },
+  { value: "Vetements", label: "Vetements" },
+
 ];
 
 type Props = {
