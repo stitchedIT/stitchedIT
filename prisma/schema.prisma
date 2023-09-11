@@ -131,8 +131,8 @@ model RecData {
   id     Int    @id @default(autoincrement())
   userId String
   user   User   @relation(fields: [userId], references: [id])
-  favBrand String
-  favColor String
+  favBrand String[]
+  favColor String[]
 }
 
 model VerificationToken {
