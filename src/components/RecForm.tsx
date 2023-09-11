@@ -26,7 +26,7 @@ type Props = {
   userId: string;
 };
 
-function UserSkills({ userId }: Props) {
+function RecDataFormComponent({ userId }: Props) {
   const [formData, setFormData] = useState<FormData>({
     userId: userId || "",
     favColor: "",
@@ -82,4 +82,4 @@ function UserSkills({ userId }: Props) {
   );
 }
 
-export default UserSkills;
+export default RecDataFormComponent;

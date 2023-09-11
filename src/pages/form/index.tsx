@@ -3,7 +3,7 @@ import { type NextPage } from "next";
 import React from "react";
 import { api } from "~/utils/api";
 import { useUser } from '@clerk/clerk-react';
-import UserSkills from "~/components/UserSkills";
+import RecDataFormComponent from "~/components/RecForm";
 import RecFormComponent from "~/components/Form";
 
 const FormPage: NextPage = () => {
@@ -12,7 +12,7 @@ const FormPage: NextPage = () => {
     return (
         <div className="bg-stitched-black p-5 md:px-20">
             {/* <RecFormComponent userId={userId} /> */}
-            <UserSkills userId={userId}></UserSkills>
+            <RecDataFormComponent userId={userId} />
         </div>
     )
 }
