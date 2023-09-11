@@ -59,6 +59,9 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
   const getBookmarks = api.post.getBookmarksByPostId.useQuery({
     postId: post.id,
   });
+  const bookmarkedPostsQ = api.post.getBookmarkedPosts.useQuery({
+    userId,
+});
   const commentsQuery = api.post.getCommentsByPostId.useQuery({
     postId: post.id,
   });
@@ -134,7 +137,8 @@ const handleSave = (id: number) => {
   savePost.mutate(
     { userId: userId, postId: id },
     {
-      onSuccess: () => {
+      onSuccess: async () => {
+        await bookmarkedPostsQ.refetch().data;
         setIsBookmarked((prev) => !prev); // Toggle the bookmarked state
         toast({ title: "Post Saved", description: "You have great taste!" });
       },
