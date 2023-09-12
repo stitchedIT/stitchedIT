@@ -45,6 +45,10 @@ export const clothingItemRouter = createTRPCRouter({
     return recommendedItems.map(item => item.clothingItem);  // Return only the clothing item details
   }),
 
+  //get 54 items depedent on user's fav brand and color which will be provided in the input 
+  //  
+  
+
   // Add a recommendation
   addFeedback: protectedProcedure
     .input(
