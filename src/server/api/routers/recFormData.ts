@@ -10,8 +10,8 @@ import {
     .input(
       z.object({
         userId: z.string(),
-        favColor: z.string(),
-        favBrand: z.string(),
+        favColor: z.array(z.string()),
+        favBrand: z.array(z.string()),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -24,4 +24,33 @@ import {
       });
       return recDatas;
     }),
- })
+
+    // Define your procedure with input validation
+    getBrandsArray: protectedProcedure
+      // Your input validation schema
+      .input(z.object({ userId: z.string() }))
+      .query(({ input, ctx }) => {
+        return ctx.prisma.recData.findMany({
+          where: {
+            userId: input.userId,
+          },
+          select: {
+            favBrand: true,
+            favColor: true,
+          },
+        });
+      }),
+      // getColorArray: protectedProcedure
+      // // Your input validation schema
+      // .input(z.object({ userId: z.string() }))
+      // .query(({ input, ctx }) => {
+      //   return ctx.prisma.recData.findMany({
+      //     where: {
+      //       userId: input.userId,
+      //     },
+      //     select: {
+      //       favBrand: true,
+      //     },
+      //   });
+      // }),
+})

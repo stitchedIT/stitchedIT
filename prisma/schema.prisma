@@ -143,11 +143,19 @@ model Likes {
 }
 
 model RecData {
+<<<<<<< HEAD
   id       Int    @id @default(autoincrement())
   userId   String
   user     User   @relation(fields: [userId], references: [id])
   favBrand String
   favColor String
+=======
+  id     Int    @id @default(autoincrement())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  favBrand String[]
+  favColor String[]
+>>>>>>> main
 }
 
 model VerificationToken {

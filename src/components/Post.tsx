@@ -59,10 +59,12 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
   const getBookmarks = api.post.getBookmarksByPostId.useQuery({
     postId: post.id,
   });
+  const bookmarkedPostsQ = api.post.getBookmarkedPosts.useQuery({
+    userId,
+});
   const commentsQuery = api.post.getCommentsByPostId.useQuery({
     postId: post.id,
   });
-
   // Animation hooks
   const likesControls = useAnimation();
   const commentControls = useAnimation();
@@ -79,7 +81,7 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
     setIsLiked(!!userLike);
 
     const userBookmark = getBookmarks.data?.find(
-      (bookmark) => bookmark.userId === userId
+      (bookmark) => bookmark.id === userId
     );
     setIsBookmarked(!!userBookmark);
   }, [getLikes.data, userId, getBookmarks.data]);
@@ -88,7 +90,6 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
     commentsQuery.data ? [...commentsQuery.data] : []
   );
   const { toast } = useToast();
-
   const handleLike = (id: number) => {
     createLike.mutate(
       { userId: userId, postId: id },
@@ -105,7 +106,6 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
     deletePost.mutate({ postId: id },
       {
         onSuccess: async () => {
-          console.log("yo");
           await posted.refetch().data;
 
         },
@@ -133,17 +133,19 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
     );
   };
 
-  const handleSave = (id: number) => {
-    savePost.mutate(
-      { userId: userId, postId: id },
-      {
-        onSuccess: () => {
-          setIsBookmarked((prev) => !prev); // toggle the bookmarked state
-          toast({ title: "Post Saved", description: "You have great taste!" });
-        },
-      }
-    );
-  };
+const handleSave = (id: number) => {
+  savePost.mutate(
+    { userId: userId, postId: id },
+    {
+      onSuccess: async () => {
+        await bookmarkedPostsQ.refetch().data;
+        setIsBookmarked((prev) => !prev); // Toggle the bookmarked state
+        toast({ title: "Post Saved", description: "You have great taste!" });
+      },
+    }
+  );
+};
+
 
   const handleViewComments = async () => {
     setShowComments(!showComments);
@@ -168,8 +170,7 @@ const Post: React.FC<PostProps> = ({ post, userId }) => {
   }
 
   const isOwner = userId === post.userId;
-console.log("username",post.user?.userName)
-console.log("img",post.user?.image)
+
   return (
     <motion.div
       className="mx-auto mt-6 flex w-full max-w-3xl flex-col items-center justify-center rounded-lg bg-stitched-black p-8 text-white shadow-lg"
@@ -337,5 +338,4 @@ console.log("img",post.user?.image)
     </motion.div>
   );
 };
-
 export default Post;
