@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { api } from "~/utils/api";
-import {supabase} from "supabaseClient.js";
+import { supabase } from "supabaseClient.js";
 
 type FormData = {
   userId: string;

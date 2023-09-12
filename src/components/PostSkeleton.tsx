@@ -24,7 +24,7 @@ function PostSkeleton() {
       </div>
 
       {/* Image placeholder */}
-      <Skeleton className="my-4 h-100 w-full rounded bg-gray-400" />
+      <Skeleton className="my-4 h-64 w-full rounded bg-gray-400" />
 
       {/* Post Description */}
       <Skeleton className="my-2 h-4 w-3/4 rounded bg-gray-400" />
@@ -43,10 +43,9 @@ function PostSkeleton() {
       <div className="w-full">
         <div className="relative mb-2 flex w-full">
           <Skeleton className="mb-2 h-12 w-full rounded bg-gray-400" />
-          <Skeleton className="absolute bottom-2 right-2 h-8 w-24 rounded bg-gray-400 mb-2" />
+          <Skeleton className="absolute bottom-2 right-2 mb-2 h-8 w-24 rounded bg-gray-400" />
         </div>
       </div>
-
     </div>
   );
 }
