@@ -1,5 +1,6 @@
 import { api } from "~/utils/api";
 import Post from "./Post";
+import PostSkeleton from "./PostSkeleton";
 // import { Toaster } from "@/components/ui/toaster";
 
 type PostListProps = {
@@ -7,12 +8,23 @@ type PostListProps = {
 };
 
 function PostList({ userId }: PostListProps) {
-  const posts = api.post.getAllPosts.useQuery();
-  let postsData = posts.data;
+  const { data: postsData, isLoading } = api.post.getAllPosts.useQuery();
+
+  if (isLoading) {
+    return (
+      <>
+        <PostSkeleton />
+        <PostSkeleton />
+        <PostSkeleton />
+        <PostSkeleton />
+        <PostSkeleton />
+      </>
+    )
+  }
 
   return (
     <div>
-      {postsData?.map((post) => (
+      {postsData?.map((post: Post) => (
         <Post key={post.id} post={post} userId={userId} />
       ))}
       {/* <Toaster /> */}
@@ -21,3 +33,4 @@ function PostList({ userId }: PostListProps) {
 }
 
 export default PostList;
+
