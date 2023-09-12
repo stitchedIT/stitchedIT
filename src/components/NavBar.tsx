@@ -64,12 +64,12 @@ function Navbar() {
       </div>
 
       {/* Search bar for /feed */}
-      {user.isSignedIn && router.pathname === "/feed" && (
+      {/* {user.isSignedIn && router.pathname === "/feed" && (
         <Input
           className="w-52 rounded border border-pink-500 bg-transparent px-4 py-2 text-white placeholder-pink-500 md:w-64 lg:w-96"
           placeholder="Search"
         />
-      )}
+      )} */}
 
       {/* Side Menu for Mobile */}
       <div
