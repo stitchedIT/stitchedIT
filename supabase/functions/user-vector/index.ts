@@ -42,9 +42,11 @@ serve(
       let userProfileVector = await calculateUserProfileVector(userFeedback);
 
       await updateUserProfileVectorInDB(userId, userProfileVector);
-      const recommendations = await getRecommendations(userProfileVector);
+      const recommendations = await getRecommendations(
+        userProfileVector,
+        userId
+      );
 
-      
       return new Response(JSON.stringify({ data: recommendations }), {
         headers: {
           "Content-Type": "application/json",
@@ -143,17 +145,16 @@ async function calculateUserProfileVector(feedbackData: any[]) {
       }
     }
 
-   
-   // Step 4: Normalize the user profile vector (optional)
-const vectorMagnitude = Math.sqrt(
-  userProfileVector.reduce((sum, value) => sum + value ** 2, 0)
-);
+    // Step 4: Normalize the user profile vector (optional)
+    const vectorMagnitude = Math.sqrt(
+      userProfileVector.reduce((sum, value) => sum + value ** 2, 0)
+    );
 
-if (vectorMagnitude !== 0) {
-  userProfileVector = userProfileVector.map(
-    (value) => value / vectorMagnitude
-  );
-}
+    if (vectorMagnitude !== 0) {
+      userProfileVector = userProfileVector.map(
+        (value) => value / vectorMagnitude
+      );
+    }
 
     return userProfileVector;
   } catch (error) {
@@ -163,56 +164,86 @@ if (vectorMagnitude !== 0) {
 }
 
 const NUMBER_OF_VECTOR_DIMENSIONS = 65; /* Your vector dimension */
-const ALPHA = .5; /* Your decay parameter */
+const ALPHA = 0.5; /* Your decay parameter */
 
-async function getRecommendations(userProfileVector: number[]) {
+async function getRecommendations(userProfileVector: number[], userId: string) {
   try {
+    // Fetch IDs of items for which the user has already provided feedback
+    const { data: userFeedbackData, error: userFeedbackError } = await supabase
+      .from("Feedback")
+      .select("clothingItemId")
+      .eq("userId", userId);
+
+    if (userFeedbackError) throw userFeedbackError;
+
+    const itemIdsWithFeedback = userFeedbackData.map(
+      (feedback) => feedback.clothingItemId
+    );
+
+    
     // Fetch all clothing item vectors from the database
     const { data: clothingItemVectors, error } = await supabase
       .from("ClothingItem")
-      .select("id, embed"); // replace 'vector' with your actual column name holding the vector data
+      .select("id, embed")
+
 
     if (error) throw error;
 
+    const unreviewedItemVectors = clothingItemVectors.filter(
+      (item) => !itemIdsWithFeedback.includes(item.id)
+    );
+
     // Calculate the cosine similarity between the userProfileVector and each item vector
-    const similarities = clothingItemVectors.map((item) => {
+    const similarities = unreviewedItemVectors.map((item) => {
       return {
         itemId: item.id,
-        similarity: cosineSimilarity(userProfileVector, item.vector),
+        similarity: cosineSimilarity(userProfileVector, item.embed),
       };
     });
 
     // Sort the items by similarity in descending order to get the top recommendations
     const topRecommendations = similarities
-      .sort((a, b) => b.similarity - a.similarity)
-      .slice(0, 10); // Get top 10 recommendations
+      .filter(rec => rec.similarity >= 0.75) // Keep only records with similarity 75% or higher
+      .sort((a, b) => b.similarity - a.similarity) // Sort them in descending order of similarity
+      .slice(0, 3); // Get the top 3 recommendations
 
-    // Fetch detailed information of the top recommended items
-    const topRecommendedItemDetails = await Promise.all(
-      topRecommendations.map(async (rec) => {
-        const { data: itemDetails, error } = await supabase
-          .from("ClothingItem")
-          .select("*")
-          .eq("id", rec.itemId);
 
-        if (error) throw error;
+    // Insert the top recommendations into the Recommendations table
+    const recommendationsToInsert = topRecommendations.map((rec) => ({
+      userId: userId,
+      clothingItemId: rec.itemId,
+      similarity_score: rec.similarity,
+    }));
 
-        return { ...itemDetails[0], similarity: rec.similarity }; // Add similarity score to the item details
-      })
-    );
+    const { error: insertError } = await supabase
+      .from("Recommendations")
+      .insert(recommendationsToInsert);
 
-    return topRecommendedItemDetails;
+    if (insertError) throw insertError;
+
+    return topRecommendations;
   } catch (error) {
     console.error(error);
     throw error;
   }
 }
 
-function cosineSimilarity(vectorA: number[], vectorB: number[]): number {
-  if (!vectorA || !vectorB) {
-    throw new Error('One or both vectors are undefined');
+function cosineSimilarity(vectorA: number[], vectorB: any): number {
+  // Ensure vectorB is an array of numbers
+  if (typeof vectorB === "string") {
+    try {
+      vectorB = JSON.parse(vectorB).map(Number);
+    } catch (e) {
+      throw new Error("Failed to parse vectorB to a number array");
+    }
   }
 
+  // Check if vectorB is now a valid array
+  if (!Array.isArray(vectorB) || vectorB.some(isNaN)) {
+    throw new Error("vectorB is not a valid number array");
+  }
+
+  // Proceed with the rest of the code as before...
   const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
   const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a * a, 0));
   const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b * b, 0));
@@ -221,7 +252,8 @@ function cosineSimilarity(vectorA: number[], vectorB: number[]): number {
     return 0;
   }
 
-  return dotProduct / (magnitudeA * magnitudeB);
+  return Math.min(1, Math.max(-1, dotProduct / (magnitudeA * magnitudeB)));
+
 }
 // To invoke:
 // curl -i --location --request POST 'https://xwhmshfqmtdtneasprwx.supabase.co/functions/v1/user-vector' \
