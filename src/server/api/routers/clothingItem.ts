@@ -11,7 +11,6 @@ export const clothingItemRouter = createTRPCRouter({
       z.object({
         userId: z.string(),
         limit: z.number(),
-        offset: z.number().default(0),
       })
     )
     .query(async ({ input, ctx }) => {
@@ -31,8 +30,7 @@ export const clothingItemRouter = createTRPCRouter({
           NOT: { id: { in: itemIdsWithFeedback } },
         },
         take: input.limit,
-        skip: input.offset, // Add this line
-        // Optionally, add more ordering logic based on other recommendation criteria
+        
       });
 
       return recommendedItems;

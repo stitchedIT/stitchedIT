@@ -30,13 +30,12 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
   const [dislikes, setDislikes] = useState(0);
   const cardRef = useRef(null);
   const recommendationAdd = api.clothingItem.addFeedback.useMutation();
-  const [offset, setOffset] = useState<number>(0);
+
   const [isMutating, setIsMutating] = useState(false);
   const { data: recommendedItems, error } =
     api.clothingItem.getRecommendedItems.useQuery({
       userId: userId,
       limit: 2500,
-      offset: offset, // Using the offset in the query
     });
 
   useEffect(() => {
@@ -46,32 +45,43 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
   }, [recommendedItems]);
 
   const onSwipe = async (direction: string) => {
-    if (isMutating) return; // If a mutation is in progress, do not proceed
-    setIsMutating(true); // Set the mutating state to true
+    if (isMutating) return;
+    setIsMutating(true);
+  
+    let currentItem :any = items[localItemIndex];
+
+    if (localItemIndex >= items.length - 1) {
+      setLocalItemIndex(0);
+    } else {
+      setLocalItemIndex((prevIndex) => prevIndex + 1);
+    }
+
 
     let feedback = "";
     if (direction === "right") {
-      setLikes((prevLikes) => prevLikes + 1);
       feedback = "like";
     } else if (direction === "left") {
-      setDislikes((prevDislikes) => prevDislikes + 1);
       feedback = "dislike";
     }
-
-    if (items[localItemIndex]) {
+  
+    if (currentItem) {
       recommendationAdd.mutate(
         {
           userId: userId,
-          clothingItemId: items[localItemIndex].id,
+          clothingItemId: currentItem.id,
           feedback: feedback,
         },
         {
           onSuccess: async () => {
-            // Fetch the updated user feedback after recording the new feedback
             try {
-              const { data, error } = await supabase.functions.invoke('user-vector', {
-                method: 'POST',
-                
+              if (direction === "right") {
+                setLikes((prevLikes) => prevLikes + 1);
+              } else if (direction === "left") {
+                setDislikes((prevDislikes) => prevDislikes + 1);
+              }
+  
+              const { data, error } = await supabase.functions.invoke("user-vector", {
+                method: "POST",
                 body: { userId },
               });
   
@@ -79,27 +89,28 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
                 throw error;
               }
   
-              console.log('Updated user feedback data:', data);
+              console.log("Updated user feedback data:", data);
             } catch (error) {
-              console.error('Failed to get updated user feedback:', error);
+              console.error("Failed to get updated user feedback:", error);
             } finally {
-              setIsMutating(false); 
+              
+              setIsMutating(false);
             }
+          },
+          onError: () => {
+            console.error("An error occurred while processing the swipe.");
+            setIsMutating(false);
           },
         }
       );
-    }
-
-    if (localItemIndex >= items.length - 1) {
-      setLocalItemIndex(0);
-    } else if (localItemIndex === 2450) {
-      // Checking if the user is at the 8th index
-      setOffset((prevOffset) => prevOffset + 50); // Increase the offset to fetch the next set of items
     } else {
-      setLocalItemIndex((prevIndex) => prevIndex + 1);
+      setIsMutating(false);
     }
   };
 
+  
+  
+  
 
   let color = "bg-" + items[localItemIndex]?.color;
   if (
@@ -108,13 +119,14 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
   ) {
     color += "-500";
   }
+
   return (
     <div className="flex h-screen items-center justify-center overflow-x-hidden overflow-y-hidden  border bg-stitched-darkGray text-white  ">
       <div className="flex justify-between ">
         <Button
           onClick={() => setLocalItemIndex((prevIndex) => prevIndex - 1)}
           disabled={localItemIndex === 0}
-          className="border-none"
+          className="border-none "
           variant="outline"
         >
           <svg
@@ -147,6 +159,7 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
           ref={cardRef}
           key={localItemIndex}
           onSwipe={onSwipe}
+          swipeRequirementType={"velocity"}
           preventSwipe={["up", "down"]}
         >
           {items[localItemIndex] && <ImageStack item={items[localItemIndex]} />}
