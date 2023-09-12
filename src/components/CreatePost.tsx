@@ -64,7 +64,7 @@ function CreatePostComponent({ userId }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-stitched-sand  p-8 rounded-lg shadow-md w-full max-w-2xl mx-auto mt-2">
+    <form onSubmit={handleSubmit} className="bg-stitched-black p-8 rounded-lg shadow-md w-full max-w-2xl mx-auto mt-2 border border-stitched-lightPink ">
       <textarea
         value={formData.description}
         onChange={(e) =>

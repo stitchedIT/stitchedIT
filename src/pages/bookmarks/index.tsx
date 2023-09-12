@@ -13,8 +13,8 @@ const BookmarkPage: NextPage = () => {
     });
     const bookmarkedPosts = bookmarkedPostsQuery.data;
     return (
-        <div className="bg-stitched-darkGray p-5 md:px-20">
-          <h1>Your Bookmarked Posts</h1>
+        <div className="bg-stitched-black p-5 md:px-20">
+          <h1 className="text-3xl text-stitched-lightPink text-center">Your Bookmarked Posts</h1>
         {bookmarkedPosts?.map((post) => (
             <Post key={post.id} post={post} userId={userId} />
         ))}
