@@ -42,35 +42,32 @@ export const recDataRouter = createTRPCRouter({
     }),
   // Define your procedure with input validation
   getItemsArray: protectedProcedure
-    // Your input validation schema
-    .input(
-      z.object({
-        userId: z.string(),
-        // brands: z.array(z.string()),
-        // colors: z.array(z.string()),
-      })
-    )
-    .query(async ({ input, ctx }) => {
-      // Call the getBrandsArray procedure to retrieve the user's favorite brands and colors
-      const brandsAndColorsArray = await ctx.prisma.recData.findMany({
+.input(z.object({ userId: z.string() }))
+.query(async ({ input, ctx }) => {
+  const brandsAndColorsArray = await ctx.prisma.recData.findMany({
+    where: {
+      userId: input.userId,
+    },
+    select: {
+      favBrand: true,
+      favColor: true,
+    },
+  });
+  
+  const userBrandsArray = brandsAndColorsArray.map((item) => item.favBrand).flat();
+  const userColorsArray = brandsAndColorsArray.map((item) => item.favColor).flat();
+  
+  const maxItemsPerBrand = Math.floor(22 / userBrandsArray.length);
+  const maxItemsPerColor = Math.floor(22 / userColorsArray.length);
+  
+  let itemsArray = [];
+
+  for (let brand of userBrandsArray) {
+    for (let color of userColorsArray) {
+      const partialItemsArray = await ctx.prisma.clothingItem.findMany({
         where: {
-          userId: input.userId,
-        },
-        select: {
-          favBrand: true,
-          favColor: true,
-        },
-      });
-      
-      // Extract the user's favorite brands and colors from the retrieved array
-      const userBrandsArray = brandsAndColorsArray.map((item) => item.favBrand).flat();
-      const userColorsArray = brandsAndColorsArray.map((item) => item.favColor).flat();
-      
-      // Query the database for items that match the user's preferences
-      const itemsArray = await ctx.prisma.clothingItem.findMany({
-        where: {
-          brand: { in: userBrandsArray },
-          color: { in: userColorsArray },
+          brand: brand,
+          color: color,
         },
         select: {
           brand: true,
@@ -78,12 +75,17 @@ export const recDataRouter = createTRPCRouter({
           description: true,
           imageUrl: true,
         },
-        take: 64,
+        take: Math.min(maxItemsPerBrand, maxItemsPerColor),
       });
+      itemsArray = [...itemsArray, ...partialItemsArray];
+    }
+  }
 
-      // Return the retrieved items array
-      return itemsArray;
-    }),
+  // If the itemsArray exceeds 66 items, you might want to trim it down here
+
+  return itemsArray;
+}),
+
   // Get 64 items dependent on user's favorite brand and color which will be provided in the input.
   // The input will be an object with the following properties:
   // - brands: array of strings
