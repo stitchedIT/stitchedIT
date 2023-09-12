@@ -7,34 +7,43 @@ import {
 
 export const clothingItemRouter = createTRPCRouter({
   getRecommendedItems: protectedProcedure
-    .input(
-      z.object({
-        userId: z.string(),
-        limit: z.number(),
-      })
-    )
-    .query(async ({ input, ctx }) => {
-      // Get items the user has already given feedback on
-      const feedbackItems = await ctx.prisma.feedback.findMany({
-        where: { userId: input.userId },
-        select: { clothingItemId: true },
-      });
-      const itemIdsWithFeedback = feedbackItems.map(
-        (item) => item.clothingItemId
-      );
+  .input(
+    z.object({
+      userId: z.string(),
+      limit: z.number(),
+    })
+  )
+  .query(async ({ input, ctx }) => {
+    // Get items the user has already given feedback on
+    const feedbackItems = await ctx.prisma.feedback.findMany({
+      where: { userId: input.userId },
+      select: { clothingItemId: true },
+    });
+    const itemIdsWithFeedback = feedbackItems.map(
+      (item) => item.clothingItemId
+    );
 
-      // Fetch items not yet shown to the user, based on some recommendation logic
-      // For simplicity, we're just avoiding items they've already seen
-      const recommendedItems = await ctx.prisma.clothingItem.findMany({
-        where: {
-          NOT: { id: { in: itemIdsWithFeedback } },
+    // Fetch recommended items from the Recommendations table based on a similarity score threshold of 75%
+    const recommendedItems = await ctx.prisma.recommendations.findMany({
+      where: {
+        userId: input.userId,
+        similarity_score: {
+          gte: "0.75"  // Ensure similarity score is a string and above 75%
         },
-        take: input.limit,
-        
-      });
+        NOT: {
+          clothingItemId: {
+            in: itemIdsWithFeedback
+          }
+        }
+      },
+      take: input.limit,
+      include: {
+        clothingItem: true  // Include details of the recommended clothing items
+      }
+    });
 
-      return recommendedItems;
-    }),
+    return recommendedItems.map(item => item.clothingItem);  // Return only the clothing item details
+  }),
 
   // Add a recommendation
   addFeedback: protectedProcedure

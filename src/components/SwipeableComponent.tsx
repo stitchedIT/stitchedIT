@@ -4,6 +4,7 @@ import ImageStack from "./ImageStack";
 import { Button } from "@/components/ui/button";
 import { api } from "~/utils/api";
 import { supabase } from "supabaseClient.js";
+import { set } from "date-fns";
 //xwhmshfqmtdtneasprwx
 type SwipeProps = {
   userId: string;
@@ -47,8 +48,8 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
   const onSwipe = async (direction: string) => {
     if (isMutating) return;
     setIsMutating(true);
-  
-    let currentItem :any = items[localItemIndex];
+
+    let currentItem: any = items[localItemIndex];
 
     if (localItemIndex >= items.length - 1) {
       setLocalItemIndex(0);
@@ -56,14 +57,13 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
       setLocalItemIndex((prevIndex) => prevIndex + 1);
     }
 
-
     let feedback = "";
     if (direction === "right") {
       feedback = "like";
     } else if (direction === "left") {
       feedback = "dislike";
     }
-  
+
     if (currentItem) {
       recommendationAdd.mutate(
         {
@@ -79,21 +79,23 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
               } else if (direction === "left") {
                 setDislikes((prevDislikes) => prevDislikes + 1);
               }
-  
-              const { data, error } = await supabase.functions.invoke("user-vector", {
-                method: "POST",
-                body: { userId },
-              });
-  
+
+              const { data, error } = await supabase.functions.invoke(
+                "user-vector",
+                {
+                  method: "POST",
+                  body: { userId },
+                }
+              );
+
               if (error) {
                 throw error;
               }
-  
+
               console.log("Updated user feedback data:", data);
             } catch (error) {
               console.error("Failed to get updated user feedback:", error);
             } finally {
-              
               setIsMutating(false);
             }
           },
@@ -106,11 +108,8 @@ const SwipeableComponent: React.FC<SwipeProps> = ({ userId }) => {
     } else {
       setIsMutating(false);
     }
+    setIsMutating(false);
   };
-
-  
-  
-  
 
   let color = "bg-" + items[localItemIndex]?.color;
   if (

@@ -52,22 +52,24 @@ model Session {
 }
 
 model User {
-  id            String           @id @default(cuid())
-  userName      String?          @unique
-  name          String
-  email         String?          @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?         
-  accounts      Account[]
-  posts         Post[]
-  comments      Comment[]
+  id              String            @id @default(cuid())
+  userName        String?           @unique
+  name            String
+  email           String?           @unique
+  emailVerified   DateTime?
+  image           String?
+  password        String?
+  profile_vector   String?           @db.Text // new field for the vector
+  accounts        Account[]
+  posts           Post[]
+  comments        Comment[]
   sessions        Session[]
-  feedback Feedback[]
-  bookmarkedPosts Post[] @relation("BookmarkedPosts")
-  wishlist      ClothingItem[] @relation("UserWishlist")
-  likes         Likes[]
-  recDatas      RecData[]
+  feedback        Feedback[]
+  bookmarkedPosts Post[]            @relation("BookmarkedPosts")
+  wishlist        ClothingItem[]    @relation("UserWishlist")
+  likes           Likes[]
+  recDatas        RecData[]
+  Recommendations Recommendations[]
 }
 
 model Post {
@@ -96,7 +98,7 @@ model Comment {
 }
 
 model ClothingItem {
-  id              Int              @id @default(autoincrement())
+  id              Int               @id @default(autoincrement())
   brand           String
   type            String
   color           String
@@ -104,9 +106,22 @@ model ClothingItem {
   category        String
   imageUrl        String
   linkUrl         String?
-  feedback Feedback[]
-  wishedBy        User[]           @relation("UserWishlist")
-  createdAt       DateTime         @default(now())
+  embed           String? // new field for the vector
+  recommendations Recommendations[] // new relation field to Recommendations model
+
+  feedback  Feedback[]
+  wishedBy  User[]     @relation("UserWishlist")
+  createdAt DateTime   @default(now())
+}
+
+model Recommendations {
+  id              BigInt        @id @default(autoincrement())
+  created_at       DateTime      @default(now())
+  userId          String?
+  clothingItemId  Int?
+  similarity_score String?
+  user            User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clothingItem    ClothingItem? @relation(fields: [clothingItemId], references: [id], onDelete: Cascade)
 }
 
 model Feedback {
@@ -128,9 +143,9 @@ model Likes {
 }
 
 model RecData {
-  id     Int    @id @default(autoincrement())
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  id       Int    @id @default(autoincrement())
+  userId   String
+  user     User   @relation(fields: [userId], references: [id])
   favBrand String
   favColor String
 }
