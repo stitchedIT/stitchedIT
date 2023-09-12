@@ -9,17 +9,17 @@ type FormData = {
 };
 
 const colorOptions = [
-  { value: "Blue", label: "Blue" },
-  { value: "Red", label: "Red" },
-  { value: "Pink", label: "Pink" },
-  { value: "Black", label: "Black"},
-  { value: "White", label: "White" },
-  { value: "Green", label: "Green" },
-  { value: "Yellow", label: "Yellow" },
-  { value: "Orange", label: "Orange" },
-  { value: "Purple", label: "Purple" },
-  { value: "Brown", label: "Brown" },
-  { value: "Grey", label: "Grey" },
+  { value: "blue", label: "Blue" },
+  { value: "red", label: "Red" },
+  { value: "pink", label: "Pink" },
+  { value: "black", label: "Black"},
+  { value: "white", label: "White" },
+  { value: "green", label: "Green" },
+  { value: "yellow", label: "Yellow" },
+  { value: "orange", label: "Orange" },
+  { value: "purple", label: "Purple" },
+  { value: "brown", label: "Brown" },
+  { value: "grey", label: "Grey" },
 ];
 
 const brandOptions = [
@@ -59,6 +59,10 @@ function RecDataFormComponent({ userId }: Props) {
   });
 
   const makeRecData = api.recdata.addRecData.useMutation();
+  const arri = api.recdata.getItemsArray.useQuery({userId: userId});
+  console.log("hey jason this is for the whole array",arri.data)
+  //example arri.data?[i] where i could be mapped
+  //to get the image url arr.data?[i].imageUrl
 
   const handleColorChange = (selectedOptions) => {
     const selectedColors = selectedOptions.map(option => option.value);
