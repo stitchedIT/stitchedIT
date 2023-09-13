@@ -42,6 +42,7 @@ serve(
       let userProfileVector = await calculateUserProfileVector(userFeedback);
 
       await updateUserProfileVectorInDB(userId, userProfileVector);
+      
       const recommendations = await getRecommendations(
         userProfileVector,
         userId
@@ -166,7 +167,7 @@ async function calculateUserProfileVector(feedbackData: any[]) {
 const NUMBER_OF_VECTOR_DIMENSIONS = 65; /* Your vector dimension */
 const ALPHA = 0.5; /* Your decay parameter */
 
-async function getRecommendations(userProfileVector: number[], userId: string) {
+async function getRecommendations(userProfileVector: any, userId: string) {
   try {
     // Fetch IDs of items for which the user has already provided feedback
     const { data: userFeedbackData, error: userFeedbackError } = await supabase
@@ -203,9 +204,9 @@ async function getRecommendations(userProfileVector: number[], userId: string) {
 
     // Sort the items by similarity in descending order to get the top recommendations
     const topRecommendations = similarities
-      .filter(rec => rec.similarity >= 0.75) // Keep only records with similarity 75% or higher
-      .sort((a, b) => b.similarity - a.similarity) // Sort them in descending order of similarity
-      .slice(0, 3); // Get the top 3 recommendations
+    .filter((rec) => rec.similarity >= 0.65 && rec.similarity <= 0.99) // Keep only records with similarity between 65% and 85%
+    .sort((a, b) => b.similarity - a.similarity) // Sort them in descending order of similarity
+    .slice(0, 6); // Get the top 3 recommendations
 
 
     // Insert the top recommendations into the Recommendations table
@@ -228,8 +229,17 @@ async function getRecommendations(userProfileVector: number[], userId: string) {
   }
 }
 
-function cosineSimilarity(vectorA: number[], vectorB: any): number {
+function cosineSimilarity(vectorA: any, vectorB: any): number {
   // Ensure vectorB is an array of numbers
+  console.log(vectorA,"vectorA")
+  if (typeof vectorA === "string") {
+    try {
+      vectorB = JSON.parse(vectorA).map(Number);
+    } catch (e) {
+      throw new Error("Failed to parse vectorA to a number array");
+    }
+  }
+
   if (typeof vectorB === "string") {
     try {
       vectorB = JSON.parse(vectorB).map(Number);
@@ -237,7 +247,9 @@ function cosineSimilarity(vectorA: number[], vectorB: any): number {
       throw new Error("Failed to parse vectorB to a number array");
     }
   }
-
+  if (!Array.isArray(vectorA) || vectorA.some(isNaN)) {
+    throw new Error("vectorA is not a valid number array");
+  }
   // Check if vectorB is now a valid array
   if (!Array.isArray(vectorB) || vectorB.some(isNaN)) {
     throw new Error("vectorB is not a valid number array");

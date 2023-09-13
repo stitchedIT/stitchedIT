@@ -10,7 +10,7 @@ const Footer: React.FunctionComponent = () => {
     <footer className="bg-stitched-black">
       <div className="flex flex-col items-center justify-between px-6 py-4 md:flex-row md:px-10">
         <h1 className="mb-4 text-3xl text-white md:mb-0">
-          Subscribe for NewsLetter
+          Subscribe for Newsletter
         </h1>
         <div className="flex gap-4">
           <Input

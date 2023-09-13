@@ -1,6 +1,7 @@
 import React, { useCallback, useState, useEffect } from "react";
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import { api } from "~/utils/api";
+import { supabase } from "supabaseClient.js";
 
 type RecommendationMatrixProps = {
   userId: string;
@@ -133,8 +134,9 @@ function RecommendationMatrix({ userId }: RecommendationMatrixProps) {
     [reccData, reccPreferences, viewedItemIDs]
   );
 
+
   const handleFeedback = useCallback(
-    (rowIndex: number, colIndex: number, feedbackResult: string) => {
+    async (rowIndex: number, colIndex: number, feedbackResult: string) => {
       const currentItem = reccData.data?.find(
         (item) => item.id === matrix[rowIndex][colIndex].id
       );
@@ -144,11 +146,36 @@ function RecommendationMatrix({ userId }: RecommendationMatrixProps) {
         return;
       }
 
+      
+      
+
       feedbackAdd.mutate({
         userId,
         clothingItemId: currentItem.id,
         feedback: feedbackResult,
       });
+
+      try {
+        const { data, error } = await supabase.functions.invoke(
+        "user-vector",
+        {
+          method: "POST",
+          body: { userId },
+        }
+      );
+      if (error) {
+        throw error;
+      }
+      console.log(data,"recc data")
+      
+      // console.log(data,"data")
+      }
+      catch(error){
+        console.error("Failed to get updated user rec:", error);
+      }
+
+      
+      
 
       const nextItem = findNextItem(rowIndex, colIndex);
       if (nextItem) {
