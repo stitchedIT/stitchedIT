@@ -80,6 +80,9 @@ export const postRouter = createTRPCRouter({
         where: {
           postId: input.postId,
         },
+        orderBy: {
+          createdAt: "desc",
+        },
         select: {
           id: true, // The ID of the comment
           content: true, // The content of the comment
@@ -174,6 +177,9 @@ export const postRouter = createTRPCRouter({
   // Get all posts
   getAllPosts: protectedProcedure.query(({ ctx }) => {
     return ctx.prisma.post.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
       include: {
         user: {
           select: {
@@ -189,34 +195,33 @@ export const postRouter = createTRPCRouter({
   }),
 
   getBookmarkedPosts: protectedProcedure
-  .input(
-    z.object({
-      userId: z.string(),
-    })
-  )
-  .query(({ input, ctx }) => {
-    return ctx.prisma.post.findMany({
-      where: {
-        bookmarkedBy: {
-          some: {
-            id: input.userId,
+    .input(
+      z.object({
+        userId: z.string(),
+      })
+    )
+    .query(({ input, ctx }) => {
+      return ctx.prisma.post.findMany({
+        where: {
+          bookmarkedBy: {
+            some: {
+              id: input.userId,
+            },
           },
         },
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            userName: true,
-            name: true,
-            email: true,
-            image: true,
+        include: {
+          user: {
+            select: {
+              id: true,
+              userName: true,
+              name: true,
+              email: true,
+              image: true,
+            },
           },
         },
-      },
-    });
-  }),
-
+      });
+    }),
 
   getBookmarksByPostId: protectedProcedure
     .input(
@@ -261,6 +266,9 @@ export const postRouter = createTRPCRouter({
       return ctx.prisma.post.findMany({
         where: {
           userId: input.userId,
+        },
+        orderBy: {
+          createdAt: "desc",
         },
       });
     }),

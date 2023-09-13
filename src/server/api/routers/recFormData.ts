@@ -57,8 +57,8 @@ export const recDataRouter = createTRPCRouter({
   const userBrandsArray = brandsAndColorsArray.map((item) => item.favBrand).flat();
   const userColorsArray = brandsAndColorsArray.map((item) => item.favColor).flat();
   
-  const maxItemsPerBrand = Math.floor(22 / userBrandsArray.length);
-  const maxItemsPerColor = Math.floor(22 / userColorsArray.length);
+  const maxItemsPerBrand = Math.floor(44 / userBrandsArray.length);
+  const maxItemsPerColor = Math.floor(44 / userColorsArray.length);
   
   let itemsArray = [];
 
@@ -74,6 +74,7 @@ export const recDataRouter = createTRPCRouter({
           color: true,
           description: true,
           imageUrl: true,
+          id: true
         },
         take: Math.min(maxItemsPerBrand, maxItemsPerColor),
       });
