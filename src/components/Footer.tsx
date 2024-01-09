@@ -74,7 +74,7 @@ const Footer: React.FunctionComponent = () => {
 
       <div className="flex flex-col items-center justify-center bg-stitched-pink px-6 py-4 text-sm text-white md:flex-row md:items-center md:justify-between md:px-10">
         <p className="mb-4 text-center md:mb-0">
-          2023 Maxwell Inc. All rights reserved
+        © 2023 stitchedIT All rights reserved
         </p>
         <ul className="flex justify-center gap-5">
           <li>Terms of Service</li>
@@ -83,7 +83,7 @@ const Footer: React.FunctionComponent = () => {
         </ul>
       </div>
     </footer>
-  );
+  ); 
 };
 
 export default Footer;
