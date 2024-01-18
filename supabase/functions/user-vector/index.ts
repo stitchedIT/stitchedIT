@@ -13,7 +13,7 @@ const key =
 const supabase = createClient(url, key);
 
 console.log("Hello from Functions!");
-//xwhmshfqmtdtneasprwx
+
 serve(
   async (req: {
     method: string;
@@ -146,7 +146,7 @@ async function calculateUserProfileVector(feedbackData: any[]) {
       }
     }
 
-    // Step 4: Normalize the user profile vector (optional)
+    // Step 4: Normalize the user profile vector 
     const vectorMagnitude = Math.sqrt(
       userProfileVector.reduce((sum, value) => sum + value ** 2, 0)
     );
@@ -255,7 +255,7 @@ function cosineSimilarity(vectorA: any, vectorB: any): number {
     throw new Error("vectorB is not a valid number array");
   }
 
-  // Proceed with the rest of the code as before...
+ 
   const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
   const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a * a, 0));
   const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b * b, 0));
@@ -267,8 +267,3 @@ function cosineSimilarity(vectorA: any, vectorB: any): number {
   return Math.min(1, Math.max(-1, dotProduct / (magnitudeA * magnitudeB)));
 
 }
-// To invoke:
-// curl -i --location --request POST 'https://xwhmshfqmtdtneasprwx.supabase.co/functions/v1/user-vector' \
-//   --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh3aG1zaGZxbXRkdG5lYXNwcnd4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTA3MTc5NCwiZXhwIjoyMDA2NjQ3Nzk0fQ.SRkt4dELsGdzTfJ70wQ1m7zOiKcvwZc0iNEYbfKjxIY' \
-//   --header 'Content-Type: application/json' \
-//   --data '{ "userId":"user_2UM78NkJQv59J9fhlt8A1VavT4l"}'
