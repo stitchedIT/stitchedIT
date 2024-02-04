@@ -204,9 +204,9 @@ async function getRecommendations(userProfileVector: any, userId: string) {
 
     // Sort the items by similarity in descending order to get the top recommendations
     const topRecommendations = similarities
-    .filter((rec) => rec.similarity >= 0.65 && rec.similarity <= 0.99) // Keep only records with similarity between 65% and 85%
+    .filter((rec) => rec.similarity >= 0.65 && rec.similarity <= 0.99) // Keep only records with similarity between 65% and 99%
     .sort((a, b) => b.similarity - a.similarity) // Sort them in descending order of similarity
-    .slice(0, 6); // Get the top 3 recommendations
+    .slice(0, 6); // Get the top 6 recommendations
 
 
     // Insert the top recommendations into the Recommendations table
